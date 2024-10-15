@@ -1,24 +1,50 @@
 <?php
 session_start();
 
-$valid_username = "testuser";
-$valid_password = "password123";
+// Voeg de databaseverbinding toe
+require_once 'db_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    if ($username == $valid_username && $password == $valid_password) {
-        $_SESSION['loggedin'] = true;
-        $_SESSION['username'] = $username;
+    // Zoek naar de ingevoerde gebruikersnaam in de database
+    $sql = "SELECT user_id, username, password FROM Users WHERE username = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
 
-        header("Location: index.php");
-        exit;
+    // Controleer of de gebruikersnaam bestaat in de database
+    if ($stmt->num_rows == 1) {
+        // Bind de resultaten aan variabelen
+        $stmt->bind_result($user_id, $db_username, $db_password);
+        $stmt->fetch();
+
+        // Controleer het wachtwoord (hash checken, indien nodig)
+        if (password_verify($password, $db_password)) {
+            // Bewaar de loginstatus en de gebruikers-ID in de sessie
+            $_SESSION['loggedin'] = true;
+            $_SESSION['user_id'] = $user_id;
+            $_SESSION['username'] = $db_username;
+
+            // Stuur de gebruiker naar de homepage
+            header("Location: index.php");
+            exit;
+        } else {
+            $error = "Ongeldig wachtwoord!";
+        }
     } else {
-        $error = "Ongeldige gebruikersnaam of wachtwoord!";
+        $error = "Gebruikersnaam bestaat niet!";
     }
+
+    // Sluit de statement
+    $stmt->close();
 }
-?> 
+
+// Sluit de databaseverbinding
+$conn->close();
+?>
 
 <!DOCTYPE html>
 <html lang="en">
