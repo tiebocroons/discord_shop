@@ -1,8 +1,8 @@
 <?php
 $host = "localhost";   // Database host
 $dbname = "discord_shop";  // database naam
-$username = "root";  // Database gebruikersnaam
-$password = "";  // Database wachtwoord
+$username = "Hypha";  // Database gebruikersnaam
+$password = "Y03lyfIN4(V3EeFf";  // Database wachtwoord
 
 // Verbinding maken met MySQL database
 $conn = new mysqli($host, $username, $password, $dbname);
