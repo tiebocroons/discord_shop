@@ -21,6 +21,10 @@ $stmt->execute();
 $stmt->bind_result($username, $digital_currency_units);
 $stmt->fetch();
 $stmt->close();
+
+// Haal producten op uit de database
+$sql = "SELECT id, title, description, price, img_url, category FROM products";
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
@@ -42,6 +46,32 @@ $stmt->close();
                 <button type="submit">Logout</button>
             </form>
         </div>
+    </div>
+    <div class="product-container">
+        <h1>Producten</h1>
+        
+        <?php
+        if ($result->num_rows > 0) {
+            // Loop door de producten en toon ze op de pagina
+            while ($row = $result->fetch_assoc()) {
+                ?>
+                <div class="product">
+                    <img src="<?php echo htmlspecialchars($row['img_url']); ?>" alt="<?php echo htmlspecialchars($row['title']); ?>">
+                    <h2><?php echo htmlspecialchars($row['title']); ?></h2>
+                    <p><?php echo htmlspecialchars($row['description']); ?></p>
+                    <p>Prijs: €<?php echo htmlspecialchars(number_format($row['price'], 2)); ?></p>
+                    <p>Categorie: <?php echo htmlspecialchars($row['category']); ?></p>
+                    <a href="product_detail.php?id=<?php echo $row['id']; ?>">Meer informatie</a>
+                </div>
+                <?php
+            }
+        } else {
+            echo "<p>Geen producten gevonden.</p>";
+        }
+        
+        // Sluit de databaseverbinding
+        $conn->close();
+        ?>
     </div>
 </body>
 <footer>
