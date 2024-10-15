@@ -1,48 +1,48 @@
 <?php
 session_start();
 
-// Voeg de databaseverbinding toe
+// Add the database connection
 require_once 'db_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Zoek naar de ingevoerde gebruikersnaam in de database
-    $sql = "SELECT user_id, username, password FROM Users WHERE username = ?";
+    // Look for the entered username in the database
+    $sql = "SELECT user_id, username, password FROM users WHERE username = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->store_result();
 
-    // Controleer of de gebruikersnaam bestaat in de database
+    // Check if the username exists in the database
     if ($stmt->num_rows == 1) {
-        // Bind de resultaten aan variabelen
+        // Bind the results to variables
         $stmt->bind_result($user_id, $db_username, $db_password);
         $stmt->fetch();
 
-        // Controleer het wachtwoord (hash checken, indien nodig)
+        // Verify the password (check hashed password if needed)
         if (password_verify($password, $db_password)) {
-            // Bewaar de loginstatus en de gebruikers-ID in de sessie
+            // Store login status and user ID in the session
             $_SESSION['loggedin'] = true;
             $_SESSION['user_id'] = $user_id;
             $_SESSION['username'] = $db_username;
 
-            // Stuur de gebruiker naar de homepage
+            // Redirect the user to the homepage
             header("Location: index.php");
             exit;
         } else {
-            $error = "Ongeldig wachtwoord!";
+            $error = "Invalid password!";
         }
     } else {
-        $error = "Gebruikersnaam bestaat niet!";
+        $error = "Username does not exist!";
     }
 
-    // Sluit de statement
+    // Close the statement
     $stmt->close();
 }
 
-// Sluit de databaseverbinding
+// Close the database connection
 $conn->close();
 ?>
 
@@ -74,7 +74,7 @@ $conn->close();
                 <button type="submit">Login</button>
             </form>
             <div class="signup-link">
-                Don't have an account? <a href="#">Sign up</a>
+                Don't have an account? <a href="create_account.php">Sign up</a>
             </div>
         </div>
     </div>
