@@ -1,51 +1,34 @@
 <?php
 session_start();
-require_once __DIR__ . "/db_connect.php"; // Include DB connection
 require_once __DIR__ . "/classes/User.php"; // Include User class
+require_once __DIR__ . "/db_connect.php"; // Include DB connection
 
-// Check if the user is logged in and is an admin
+// Check if user is logged in
 $user = new User();
 if (!$user->isLoggedIn() || !$user->isAdmin()) {
     header("Location: login.php");
     exit;
 }
 
-// Initialize variables
-$title = $description = $price = $img_url = $category = "";
-$error = "";
-$success = "";
-
-// Handle form submission
+// Handle form submission for adding a new product
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $title = trim($_POST['title']);
-    $description = trim($_POST['description']);
-    $price = trim($_POST['price']);
-    $img_url = trim($_POST['img_url']);
+    $title = $_POST['title'];
+    $description = $_POST['description'];
+    $price = $_POST['price'];
+    $img_url = $_POST['img_url'];
     $category = $_POST['category'];
 
-    // Validate input
-    if (empty($title) || empty($description) || empty($price) || empty($img_url) || empty($category)) {
-        $error = "All fields are required.";
-    } elseif (!is_numeric($price) || $price <= 0) {
-        $error = "Price must be a positive number.";
-    } else {
-        // Prepare and execute the SQL statement
-        $sql = "INSERT INTO products (title, description, price, img_url, category) VALUES (?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssdss", $title, $description, $price, $img_url, $category);
+    // Prepare SQL statement to insert new product
+    $sql = "INSERT INTO products (title, description, price, img_url, category) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssds", $title, $description, $price, $img_url, $category);
 
-        if ($stmt->execute()) {
-            $success = "Product added successfully!";
-            // Clear the form after successful submission
-            $title = $description = $price = $img_url = $category = "";
-        } else {
-            $error = "Error adding product: " . $stmt->error;
-        }
-        $stmt->close();
+    if ($stmt->execute()) {
+        $success = "Product added successfully!";
+    } else {
+        $error = "Error adding product: " . $stmt->error;
     }
 }
-
-$conn->close(); // Close DB connection
 ?>
 
 <!DOCTYPE html>
@@ -60,25 +43,26 @@ $conn->close(); // Close DB connection
 <body>
     <div class="container">
         <h1>Add New Product</h1>
-        
-        <?php if ($error): ?>
-            <p style="color: red;"><?php echo htmlspecialchars($error); ?></p>
-        <?php elseif ($success): ?>
-            <p style="color: green;"><?php echo htmlspecialchars($success); ?></p>
-        <?php endif; ?>
-
+        <?php
+        if (isset($success)) {
+            echo "<p style='color: green;'>$success</p>";
+        }
+        if (isset($error)) {
+            echo "<p style='color: red;'>$error</p>";
+        }
+        ?>
         <form method="POST" action="add_product.php">
-            <label for="title">Product Title</label>
-            <input type="text" id="title" name="title" value="<?php echo htmlspecialchars($title); ?>" required>
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" required>
 
             <label for="description">Description</label>
-            <textarea id="description" name="description" required><?php echo htmlspecialchars($description); ?></textarea>
+            <textarea id="description" name="description" required></textarea>
 
             <label for="price">Price</label>
-            <input type="number" id="price" name="price" value="<?php echo htmlspecialchars($price); ?>" required step="0.01">
+            <input type="number" id="price" name="price" step="0.01" required>
 
             <label for="img_url">Image URL</label>
-            <input type="text" id="img_url" name="img_url" value="<?php echo htmlspecialchars($img_url); ?>" required>
+            <input type="text" id="img_url" name="img_url" required>
 
             <label for="category">Category</label>
             <select id="category" name="category" required>
@@ -90,6 +74,14 @@ $conn->close(); // Close DB connection
 
             <button type="submit">Add Product</button>
         </form>
+        
+        <!-- Navigation link to go back to index.php -->
+        <a href="index.php" class="back-link">Back to Product List</a>
     </div>
 </body>
 </html>
+
+<?php
+// Close the database connection
+$conn->close();
+?>
