@@ -1,18 +1,21 @@
 <?php
+require_once __DIR__ . "/classes/User.php"; // Include the User class
 session_start();
-require_once __DIR__ . "/classes/User.php"; // Include User class
-require_once __DIR__ . "/db_connect.php"; // Include DB connection
 
-// Check if user is logged in
 $user = new User();
-if (!$user->isLoggedIn()) {
-    header("Location: login.php");
-    exit;
-}
 
-// Fetch all products from the database
-$sql = "SELECT * FROM products";
-$result = $conn->query($sql);
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    // Try to log in the user
+    if ($user->loginUser($username, $password)) {
+        header("Location: index.php");
+        exit;
+    } else {
+        $error = "Invalid username or password!";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -21,46 +24,29 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Product Overview</title>
+    <title>Login</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome, <?php echo htmlspecialchars($user->getUsername()); ?>!</h1>
-        <p>You are successfully logged in.</p>
+    <div class="login-container">
+        <h1>Login</h1>
+        <?php
+        if (isset($error)) {
+            echo "<p style='color: red;'>$error</p>";
+        }
+        ?>
+        <form method="POST" action="login.php">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
 
-        <?php if ($user->isAdmin()): // Check if the user is an admin ?>
-            <div class="admin-options">
-                <h2>Admin Options</h2>
-                <a href="add_product.php">Add New Product</a>
-            </div>
-        <?php endif; ?>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
-        <h2>Available Products</h2>
-        <div class="product-list">
-            <?php if ($result->num_rows > 0): ?>
-                <?php while ($product = $result->fetch_assoc()): ?>
-                    <div class="product-item">
-                        <img src="<?php echo htmlspecialchars($product['img_url']); ?>" alt="<?php echo htmlspecialchars($product['title']); ?>" />
-                        <h3><?php echo htmlspecialchars($product['title']); ?></h3>
-                        <p><?php echo htmlspecialchars($product['description']); ?></p>
-                        <p><strong>Price:</strong> <?php echo $product['price']; ?> units</p>
-                        <a href="product.php?id=<?php echo $product['id']; ?>">View Details</a>
-                    </div>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <p>No products available.</p>
-            <?php endif; ?>
-        </div>
-
-        <form action="logout.php" method="POST">
-            <button type="submit">Logout</button>
+            <button type="submit">Login</button>
         </form>
+        <div class="signup-link">
+            Don't have an account? <a href="create_account.php">Sign up</a>
+        </div>
     </div>
 </body>
 </html>
-
-<?php
-// Close DB connection
-$conn->close();
-?>
