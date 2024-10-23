@@ -3,10 +3,8 @@ session_start();
 require_once __DIR__ . "/classes/User.php"; // Include User class
 require_once __DIR__ . "/db_connect.php"; // Include DB connection
 
-// Initialize User class with database connection
-$user = new User($conn); // Pass the DB connection to User class
-
 // Check if user is logged in
+$user = new User();
 if (!$user->isLoggedIn()) {
     header("Location: login.php");
     exit;
@@ -15,11 +13,6 @@ if (!$user->isLoggedIn()) {
 // Fetch all products from the database
 $sql = "SELECT * FROM products";
 $result = $conn->query($sql);
-
-// Check for query execution error
-if ($result === false) {
-    die("Error fetching products: " . $conn->error);
-}
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +28,14 @@ if ($result === false) {
     <div class="container">
         <h1>Welcome, <?php echo htmlspecialchars($user->getUsername()); ?>!</h1>
         <p>You are successfully logged in.</p>
-        
+
+        <?php if ($user->isAdmin()): // Check if the user is an admin ?>
+            <div class="admin-options">
+                <h2>Admin Options</h2>
+                <a href="add_product.php">Add New Product</a>
+            </div>
+        <?php endif; ?>
+
         <h2>Available Products</h2>
         <div class="product-list">
             <?php if ($result->num_rows > 0): ?>
@@ -44,7 +44,7 @@ if ($result === false) {
                         <img src="<?php echo htmlspecialchars($product['img_url']); ?>" alt="<?php echo htmlspecialchars($product['title']); ?>" />
                         <h3><?php echo htmlspecialchars($product['title']); ?></h3>
                         <p><?php echo htmlspecialchars($product['description']); ?></p>
-                        <p><strong>Price:</strong> <?php echo htmlspecialchars($product['price']); ?> units</p>
+                        <p><strong>Price:</strong> <?php echo $product['price']; ?> units</p>
                         <a href="product.php?id=<?php echo $product['id']; ?>">View Details</a>
                     </div>
                 <?php endwhile; ?>
