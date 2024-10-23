@@ -1,34 +1,50 @@
 <?php
 session_start();
-require_once __DIR__ . "/classes/User.php"; // Include User class
-require_once __DIR__ . "/db_connect.php"; // Include DB connection
+require_once 'db_connect.php'; // Include DB connection
+require_once 'classes/User.php'; // Include User class
 
-// Check if user is logged in
+// Create a User object to check if the user is an admin
 $user = new User();
+
+// Check if the user is logged in and is an admin
 if (!$user->isLoggedIn() || !$user->isAdmin()) {
-    header("Location: login.php");
+    header("Location: login.php"); // Redirect if not logged in or not admin
     exit;
 }
 
-// Handle form submission for adding a new product
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get form data
     $title = $_POST['title'];
     $description = $_POST['description'];
     $price = $_POST['price'];
     $img_url = $_POST['img_url'];
     $category = $_POST['category'];
 
-    // Prepare SQL statement to insert new product
+    // Prepare the SQL statement
     $sql = "INSERT INTO products (title, description, price, img_url, category) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssds", $title, $description, $price, $img_url, $category);
 
-    if ($stmt->execute()) {
-        $success = "Product added successfully!";
-    } else {
-        $error = "Error adding product: " . $stmt->error;
+    // Check for errors in preparing the statement
+    if (!$stmt) {
+        die("SQL Error: " . $conn->error);
     }
+
+    // Bind the parameters (note the type string must match the number of variables)
+    $stmt->bind_param('ssdss', $title, $description, $price, $img_url, $category);
+
+    // Execute the statement
+    if ($stmt->execute()) {
+        echo "Product added successfully.";
+    } else {
+        echo "Error adding product: " . $stmt->error;
+    }
+
+    // Close the statement
+    $stmt->close();
 }
+
+// Close DB connection
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -43,23 +59,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <div class="container">
         <h1>Add New Product</h1>
-        <?php
-        if (isset($success)) {
-            echo "<p style='color: green;'>$success</p>";
-        }
-        if (isset($error)) {
-            echo "<p style='color: red;'>$error</p>";
-        }
-        ?>
         <form method="POST" action="add_product.php">
             <label for="title">Title</label>
             <input type="text" id="title" name="title" required>
 
             <label for="description">Description</label>
-            <textarea id="description" name="description" required></textarea>
+            <input type="text" id="description" name="description" required>
 
             <label for="price">Price</label>
-            <input type="number" id="price" name="price" step="0.01" required>
+            <input type="number" step="0.01" id="price" name="price" required>
 
             <label for="img_url">Image URL</label>
             <input type="text" id="img_url" name="img_url" required>
@@ -75,13 +83,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <button type="submit">Add Product</button>
         </form>
         
-        <!-- Navigation link to go back to index.php -->
-        <a href="index.php" class="back-link">Back to Product List</a>
+        <!-- Button to go back to index.php -->
+        <form action="index.php" method="GET">
+            <button type="submit">Back to Products</button>
+        </form>
     </div>
 </body>
 </html>
-
-<?php
-// Close the database connection
-$conn->close();
-?>
