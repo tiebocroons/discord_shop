@@ -1,32 +1,19 @@
 <?php
-require_once 'db_connect.php';
+require_once __DIR__ . "/classes/User.php"; // Include the User class
+session_start();
+
+$user = new User();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Hash the password
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-    // Check if the username already exists
-    $sql = "SELECT username FROM users WHERE username = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->store_result();
-
-    if ($stmt->num_rows > 0) {
-        echo "This username is already in use.";
+    if ($user->createUser($username, $password)) {
+        $_SESSION['success'] = "Account created successfully. You can now log in.";
+        header("Location: login.php");
+        exit;
     } else {
-        // Insert the new user into the database with default 1000 digital currency units
-        $sql = "INSERT INTO users (username, password, digital_currency_units) VALUES (?, ?, 1000.00)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $username, $hashed_password);
-        if ($stmt->execute()) {
-            echo "Account created. You can now log in.";
-        } else {
-            echo "Something went wrong. Please try again.";
-        }
+        $error = "The username is already in use.";
     }
 }
 ?>
@@ -42,7 +29,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
     <div class="signup-container">
-        <h1>Create Account</h1>
+        <h1>Create an Account</h1>
+        <?php
+        if (isset($error)) {
+            echo "<p style='color: red;'>$error</p>";
+        }
+        ?>
         <form method="POST" action="create_account.php">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" placeholder="Enter your username" required>
@@ -52,9 +44,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <button type="submit">Create Account</button>
         </form>
-    </div>
-    <div>
-        <a href="login.php">Login page</a>
     </div>
 </body>
 </html>
