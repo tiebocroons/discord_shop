@@ -6,16 +6,16 @@ class User {
     private $userId;
     private $username;
     private $isAdmin;
-    
+
     public function __construct() {
         // Initialize the database connection using the Database class
         $this->db = Database::getInstance()->getConnection();
-        
+
         // Check if the user is already logged in by checking session data
         if (isset($_SESSION['user_id'])) {
             $this->userId = $_SESSION['user_id'];
             $this->username = $_SESSION['username'];
-            $this->isAdmin = $_SESSION['is_admin'];
+            $this->isAdmin = $_SESSION['is_admin']; // Should now be a boolean
         }
     }
 
@@ -31,7 +31,7 @@ class User {
 
     // Method to check if the logged-in user is an admin
     public function isAdmin() {
-        return $this->isAdmin;
+        return (bool)$this->isAdmin; // Ensure it's returned as a boolean
     }
 
     // Method to create a new user (without email)
@@ -51,10 +51,10 @@ class User {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
         // Insert the new user into the database
-        $sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+        $sql = "INSERT INTO users (username, password, is_admin) VALUES (?, ?, FALSE)"; // Default is_admin to FALSE
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param('ss', $username, $hashed_password);
-        
+
         return $stmt->execute();
     }
 
@@ -77,7 +77,7 @@ class User {
                 // Store user data in the session
                 $_SESSION['user_id'] = $userId;
                 $_SESSION['username'] = $dbUsername;
-                $_SESSION['is_admin'] = $isAdmin;
+                $_SESSION['is_admin'] = (bool)$isAdmin; // Store as boolean
 
                 return true; // Successful login
             } else {
@@ -94,3 +94,4 @@ class User {
         session_destroy();
     }
 }
+?>
