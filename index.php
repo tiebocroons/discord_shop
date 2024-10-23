@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . "/classes/User.php"; // Include User class
 require_once __DIR__ . "/db_connect.php"; // Include DB connection
 
-// Check if user is logged in
+// Create User instance and check if user is logged in
 $user = new User();
 if (!$user->isLoggedIn()) {
     header("Location: login.php");
@@ -28,14 +28,14 @@ $result = $conn->query($sql);
     <div class="container">
         <h1>Welcome, <?php echo htmlspecialchars($user->getUsername()); ?>!</h1>
         <p>You are successfully logged in.</p>
-
-        <?php if ($user->isAdmin()): // Check if the user is an admin ?>
-            <div class="admin-options">
-                <h2>Admin Options</h2>
+        
+        <!-- Admin check for navigation -->
+        <?php if ($user->isAdmin()): ?>
+            <div class="admin-nav">
                 <a href="add_product.php">Add New Product</a>
             </div>
         <?php endif; ?>
-
+        
         <h2>Available Products</h2>
         <div class="product-list">
             <?php if ($result->num_rows > 0): ?>
