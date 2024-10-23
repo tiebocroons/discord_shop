@@ -1,30 +1,25 @@
 <?php
 session_start();
+require_once __DIR__ . "/classes/User.php"; // Include User class
+require_once __DIR__ . "/db_connect.php"; // Include DB connection
 
-// Controleer of de gebruiker ingelogd is
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+// Initialize User class with database connection
+$user = new User($conn); // Pass the DB connection to User class
+
+// Check if user is logged in
+if (!$user->isLoggedIn()) {
     header("Location: login.php");
     exit;
 }
 
-// Voeg de databaseverbinding toe
-require_once 'db_connect.php';
-
-// Haal de gebruiker-ID uit de sessie
-$user_id = $_SESSION['user_id'];
-
-// Query om de gebruiker-informatie op te halen
-$sql = "SELECT username, digital_currency_units FROM Users WHERE user_id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$stmt->bind_result($username, $digital_currency_units);
-$stmt->fetch();
-$stmt->close();
-
-// Haal producten op uit de database
-$sql = "SELECT id, title, description, price, img_url, category FROM products";
+// Fetch all products from the database
+$sql = "SELECT * FROM products";
 $result = $conn->query($sql);
+
+// Check for query execution error
+if ($result === false) {
+    die("Error fetching products: " . $conn->error);
+}
 ?>
 
 <!DOCTYPE html>
@@ -33,48 +28,39 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Welkom</title>
+    <title>Product Overview</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-box">
-            <h1>Welkom, <?php echo htmlspecialchars($username); ?>!</h1>
-            <p>Je bent succesvol ingelogd.</p>
-            <p>Je hebt <?php echo htmlspecialchars($digital_currency_units); ?> digitale units.</p>
-            <form action="logout.php" method="POST">
-                <button type="submit">Logout</button>
-            </form>
+    <div class="container">
+        <h1>Welcome, <?php echo htmlspecialchars($user->getUsername()); ?>!</h1>
+        <p>You are successfully logged in.</p>
+        
+        <h2>Available Products</h2>
+        <div class="product-list">
+            <?php if ($result->num_rows > 0): ?>
+                <?php while ($product = $result->fetch_assoc()): ?>
+                    <div class="product-item">
+                        <img src="<?php echo htmlspecialchars($product['img_url']); ?>" alt="<?php echo htmlspecialchars($product['title']); ?>" />
+                        <h3><?php echo htmlspecialchars($product['title']); ?></h3>
+                        <p><?php echo htmlspecialchars($product['description']); ?></p>
+                        <p><strong>Price:</strong> <?php echo htmlspecialchars($product['price']); ?> units</p>
+                        <a href="product.php?id=<?php echo $product['id']; ?>">View Details</a>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p>No products available.</p>
+            <?php endif; ?>
         </div>
-    </div>
-    <div class="product-container">
-        <h1>Producten</h1>
-        
-        <?php
-        if ($result->num_rows > 0) {
-            // Loop door de producten en toon ze op de pagina
-            while ($row = $result->fetch_assoc()) {
-                ?>
-                <div class="product">
-                    <img src="<?php echo htmlspecialchars($row['img_url']); ?>" alt="<?php echo htmlspecialchars($row['title']); ?>">
-                    <h2><?php echo htmlspecialchars($row['title']); ?></h2>
-                    <p><?php echo htmlspecialchars($row['description']); ?></p>
-                    <p>Prijs: €<?php echo htmlspecialchars(number_format($row['price'], 2)); ?></p>
-                    <p>Categorie: <?php echo htmlspecialchars($row['category']); ?></p>
-                    <a href="product_detail.php?id=<?php echo $row['id']; ?>">Meer informatie</a>
-                </div>
-                <?php
-            }
-        } else {
-            echo "<p>Geen producten gevonden.</p>";
-        }
-        
-        // Sluit de databaseverbinding
-        $conn->close();
-        ?>
+
+        <form action="logout.php" method="POST">
+            <button type="submit">Logout</button>
+        </form>
     </div>
 </body>
-<footer>
-    
-</footer>
 </html>
+
+<?php
+// Close DB connection
+$conn->close();
+?>
