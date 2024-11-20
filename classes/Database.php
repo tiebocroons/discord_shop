@@ -4,10 +4,10 @@ class Database {
     private $conn;
 
     // Database configuration
-    private $host = 'localhost';  // Replace with your database host
-    private $db_name = 'discord_shop';  // Replace with your database name
-    private $username = 'Hypha';  // Replace with your database username
-    private $password = 'Nvc5wo)(NRz-v79i';  // Replace with your database password
+    private $host = 'discordshop.railway.internal';  // Replace with your database host
+    private $db_name = 'railway';  // Replace with your database name
+    private $username = 'root';  // Replace with your database username
+    private $password = 'rLCyCNYAXMcMPUeNfjeAgyjxLPdOihTk';  // Replace with your database password
 
     // Private constructor to prevent direct instantiation
     private function __construct() {
