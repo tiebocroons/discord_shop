@@ -10,9 +10,23 @@ if (!$user->isLoggedIn()) {
     exit;
 }
 
-// Fetch all products from the database
+// Fetch distinct categories for the filter dropdown
+$categoryQuery = "SELECT DISTINCT category FROM products";
+$categoryResult = $conn->query($categoryQuery);
+
+// Fetch all products, optionally filtered by category
+$category = isset($_GET['category']) ? $_GET['category'] : '';
 $sql = "SELECT * FROM products";
-$result = $conn->query($sql);
+if (!empty($category)) {
+    $sql .= " WHERE category = ?";
+}
+
+$stmt = $conn->prepare($sql);
+if (!empty($category)) {
+    $stmt->bind_param("s", $category);
+}
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +49,24 @@ $result = $conn->query($sql);
                 <a href="add_product.php">Add New Product</a>
             </div>
         <?php endif; ?>
-        
+
+        <!-- Filter by Category -->
+        <form method="GET" action="">
+            <label for="category">Filter by Category:</label>
+            <select name="category" id="category">
+                <option value="">All</option>
+                <?php if ($categoryResult->num_rows > 0): ?>
+                    <?php while ($row = $categoryResult->fetch_assoc()): ?>
+                        <option value="<?php echo htmlspecialchars($row['category']); ?>" 
+                            <?php echo ($category === $row['category']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($row['category']); ?>
+                        </option>
+                    <?php endwhile; ?>
+                <?php endif; ?>
+            </select>
+            <button type="submit">Filter</button>
+        </form>
+
         <h2>Available Products</h2>
         <div class="product-list">
             <?php if ($result->num_rows > 0): ?>
@@ -49,7 +80,7 @@ $result = $conn->query($sql);
                     </div>
                 <?php endwhile; ?>
             <?php else: ?>
-                <p>No products available.</p>
+                <p>No products available for the selected category.</p>
             <?php endif; ?>
         </div>
 
