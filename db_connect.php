@@ -1,8 +1,8 @@
 <?php
 $host = "mysql://root:rLCyCNYAXMcMPUeNfjeAgyjxLPdOihTk@autorack.proxy.rlwy.net:21990/railway";   // Database host
 $dbname = "railway";  // database naam
-$username = "tiebocroons";  // Database gebruikersnaam
-$password = "Gt0lBT0MtVnanfbn";  // Database wachtwoord
+$username = "root";  // Database gebruikersnaam
+$password = "rLCyCNYAXMcMPUeNfjeAgyjxLPdOihTk";  // Database wachtwoord
 
 // Verbinding maken met MySQL database
 $conn = new mysqli($host, $username, $password, $dbname);
