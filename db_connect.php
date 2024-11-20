@@ -1,5 +1,5 @@
 <?php
-$host = "mysql://root:rLCyCNYAXMcMPUeNfjeAgyjxLPdOihTk@autorack.proxy.rlwy.net:21990/railway";   // Database host
+$host = "discordshop.railway.internal";   // Database host
 $dbname = "railway";  // database naam
 $username = "root";  // Database gebruikersnaam
 $password = "rLCyCNYAXMcMPUeNfjeAgyjxLPdOihTk";  // Database wachtwoord
