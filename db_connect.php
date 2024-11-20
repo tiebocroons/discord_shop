@@ -1,8 +1,8 @@
 <?php
-$host = "mysql";   // Database host
-$dbname = "discord_shop";  // database naam
-$username = "Hypha";  // Database gebruikersnaam
-$password = "Nvc5wo)(NRz-v79i";  // Database wachtwoord
+$host = "mysql://root:rLCyCNYAXMcMPUeNfjeAgyjxLPdOihTk@autorack.proxy.rlwy.net:21990/railway";   // Database host
+$dbname = "railway";  // database naam
+$username = "tiebocroons";  // Database gebruikersnaam
+$password = "Gt0lBT0MtVnanfbn";  // Database wachtwoord
 
 // Verbinding maken met MySQL database
 $conn = new mysqli($host, $username, $password, $dbname);
