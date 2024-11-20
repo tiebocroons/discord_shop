@@ -1,5 +1,5 @@
 <?php
-$host = "mysql://root:rLCyCNYAXMcMPUeNfjeAgyjxLPdOihTk@autorack.proxy.rlwy.net:21990/railway";   // Database host
+$host = "mysql://root:rLCyCNYAXMcMPUeNfjeAgyjxLPdOihTk@mysql.railway.internal:3306/railway";   // Database host
 $dbname = "railway";  // database naam
 $username = "root";  // Database gebruikersnaam
 $password = "rLCyCNYAXMcMPUeNfjeAgyjxLPdOihTk";  // Database wachtwoord
