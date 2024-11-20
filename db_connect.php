@@ -1,5 +1,5 @@
 <?php
-$host = "localhost";   // Database host
+$host = "mysql";   // Database host
 $dbname = "discord_shop";  // database naam
 $username = "Hypha";  // Database gebruikersnaam
 $password = "Nvc5wo)(NRz-v79i";  // Database wachtwoord
