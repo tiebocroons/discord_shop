@@ -59,26 +59,31 @@ class User {
     }
 
     // Method to login a user
-    public function loginUser($username, $password) {
-        // Find the user in the database
-        $sql = "SELECT user_id, username, password, is_admin FROM users WHERE username = ?";
-        $stmt = $this->db->prepare($sql);
+    public function login($username, $password) {
+        global $conn; // Assuming $conn is the database connection
+    
+        $sql = "SELECT id, username, password, is_admin FROM users WHERE username = ?";
+        $stmt = $conn->prepare($sql);
+        if ($stmt === false) {
+            die('Prepare failed: ' . htmlspecialchars($conn->error));
+        }
+    
         $stmt->bind_param('s', $username);
         $stmt->execute();
         $stmt->store_result();
-
+    
         if ($stmt->num_rows == 1) {
             // Bind the results to variables
             $stmt->bind_result($userId, $dbUsername, $dbPassword, $isAdmin);
             $stmt->fetch();
-
+    
             // Verify the password
             if (password_verify($password, $dbPassword)) {
                 // Store user data in the session
                 $_SESSION['user_id'] = $userId;
                 $_SESSION['username'] = $dbUsername;
                 $_SESSION['is_admin'] = (bool)$isAdmin; // Store as boolean
-
+    
                 return true; // Successful login
             } else {
                 return false; // Invalid password
