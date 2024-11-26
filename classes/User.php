@@ -10,7 +10,7 @@ class User {
     }
 
     public function loginUser($username, $password) {
-        $stmt = $this->conn->prepare('SELECT id, password FROM users WHERE username = ?');
+        $stmt = $this->conn->prepare('SELECT user_id, password FROM users WHERE username = ?');
         $stmt->bind_param('s', $username);
         $stmt->execute();
         $stmt->store_result();
