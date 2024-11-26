@@ -23,8 +23,13 @@ if (!$product) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     $reviewManager = new ReviewManager($conn);
-    $reviewManager->addReview($data['user_id'], $data['product_id'], $data['rating'], $data['comment']);
-    echo json_encode(['success' => true]);
+    try {
+        $reviewManager->addReview($data['user_id'], $data['product_id'], $data['rating'], $data['comment']);
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        error_log($e->getMessage());
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    }
     exit;
 }
 
@@ -97,8 +102,11 @@ $reviews = $reviewManager->fetchReviews($productId);
                         reviewList.append(reviewItem);
                         $('#review-form')[0].reset();
                     } else {
-                        alert('Failed to submit review');
+                        alert('Failed to submit review: ' + data.error);
                     }
+                },
+                error: function(xhr, status, error) {
+                    alert('An error occurred: ' + error);
                 }
             });
         });
