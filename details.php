@@ -7,7 +7,7 @@ $productId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $product = null;
 
 if ($productId > 0) {
-    $stmt = $conn->prepare('SELECT name, description, price FROM products WHERE id = ?');
+    $stmt = $conn->prepare('SELECT title, description, price FROM products WHERE id = ?');
     $stmt->bind_param('i', $productId);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -30,7 +30,7 @@ if (!$product) {
 <body>
     <!-- Product Details Section -->
     <div id="product-details">
-        <h1><?php echo htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8'); ?></h1>
+        <h1><?php echo htmlspecialchars($product['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
         <p><?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></p>
         <p><strong>Price:</strong> <?php echo htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8'); ?></p>
         <button id="view-details">View Details</button>
