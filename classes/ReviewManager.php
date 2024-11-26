@@ -8,20 +8,20 @@ class ReviewManager {
 
     public function fetchReviews($productId) {
         $stmt = $this->conn->prepare('SELECT comment FROM product_reviews WHERE product_id = ?');
-        $stmt->bind_param('i', $productId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_all(MYSQLI_ASSOC);
+        if (!$stmt) {
+            throw new Exception("Prepare statement failed: " . $this->conn->errorInfo()[2]);
+        }
+        $stmt->execute([$productId]);
+        return $stmt->fetchAll();
     }
 
     public function addReview($userId, $productId, $comment) {
         $stmt = $this->conn->prepare('INSERT INTO product_reviews (user_id, product_id, comment) VALUES (?, ?, ?)');
         if (!$stmt) {
-            throw new Exception($this->conn->error);
+            throw new Exception("Prepare statement failed: " . $this->conn->errorInfo()[2]);
         }
-        $stmt->bind_param('iis', $userId, $productId, $comment);
-        if (!$stmt->execute()) {
-            throw new Exception($stmt->error);
+        if (!$stmt->execute([$userId, $productId, $comment])) {
+            throw new Exception("Execute statement failed: " . $stmt->errorInfo()[2]);
         }
     }
 }
