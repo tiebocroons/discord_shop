@@ -131,6 +131,7 @@ $reviews = $reviewManager->fetchReviews($productId);
                         reviewList.append(reviewItem);
                         $('#review-form')[0].reset();
                     } else {
+                        console.error('Failed to submit review: ' + response.error); // Log the error for debugging
                         alert('Failed to submit review: ' + response.error);
                     }
                 },
