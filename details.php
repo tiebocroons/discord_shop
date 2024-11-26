@@ -9,6 +9,7 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+// Check if the user is authenticated
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'error' => 'User not authenticated.']);
     exit;
@@ -112,58 +113,58 @@ $reviews = $reviewManager->fetchReviews($productId);
         </form>
     </div>
 
-        <script>
-        $(document).ready(function() {
-            const userId = parseInt($('#user_id').val(), 10);
-            const productId = parseInt($('#product_id').val(), 10);
-    
-            // Handle review form submission
-            $('#review-form').on('submit', function(event) {
-                event.preventDefault();
-                const comment = $('#comment').val();
-                const csrfToken = $('#csrf_token').val();
-    
-                console.log({
+    <script>
+    $(document).ready(function() {
+        const userId = parseInt($('#user_id').val(), 10);
+        const productId = parseInt($('#product_id').val(), 10);
+
+        // Handle review form submission
+        $('#review-form').on('submit', function(event) {
+            event.preventDefault();
+            const comment = $('#comment').val();
+            const csrfToken = $('#csrf_token').val();
+
+            console.log({
+                user_id: userId,
+                product_id: productId,
+                comment: comment,
+                csrf_token: csrfToken
+            }); // Log the data being sent for debugging
+
+            $.ajax({
+                url: 'details.php',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
                     user_id: userId,
                     product_id: productId,
                     comment: comment,
                     csrf_token: csrfToken
-                }); // Log the data being sent for debugging
-    
-                $.ajax({
-                    url: 'details.php',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        user_id: userId,
-                        product_id: productId,
-                        comment: comment,
-                        csrf_token: csrfToken
-                    }),
-                    success: function(response) {
-                        console.log(response); // Log the response for debugging
-                        if (response.success) {
-                            const reviewList = $('#review-list');
-                            const reviewItem = $('<div>').addClass('review-item');
-                            reviewItem.html(`<strong>Comment:</strong> ${comment}`);
-                            reviewList.append(reviewItem);
-                            $('#review-form')[0].reset();
-                        } else {
-                            console.error('Failed to submit review: ' + response.error); // Log the error for debugging
-                            if (response.logs) {
-                                response.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
-                            }
-                            alert('Failed to submit review: ' + response.error);
+                }),
+                success: function(response) {
+                    console.log(response); // Log the response for debugging
+                    if (response.success) {
+                        const reviewList = $('#review-list');
+                        const reviewItem = $('<div>').addClass('review-item');
+                        reviewItem.html(`<strong>Comment:</strong> ${comment}`);
+                        reviewList.append(reviewItem);
+                        $('#review-form')[0].reset();
+                    } else {
+                        console.error('Failed to submit review: ' + response.error); // Log the error for debugging
+                        if (response.logs) {
+                            response.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('AJAX error: ' + error); // Log the AJAX error for debugging
-                        console.error('Response text: ' + xhr.responseText); // Log the response text for debugging
-                        alert('An error occurred: ' + error);
+                        alert('Failed to submit review: ' + response.error);
                     }
-                });
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error: ' + error); // Log the AJAX error for debugging
+                    console.error('Response text: ' + xhr.responseText); // Log the response text for debugging
+                    alert('An error occurred: ' + error);
+                }
             });
         });
+    });
     </script>
 </body>
 </html>
