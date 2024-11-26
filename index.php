@@ -10,6 +10,9 @@ if (!$user->isLoggedIn()) {
     exit;
 }
 
+// Get the database connection
+$conn = Database::getInstance()->getConnection();
+
 // Fetch distinct categories for the filter dropdown
 $categoryQuery = "SELECT DISTINCT category FROM products";
 $categoryResult = $conn->query($categoryQuery);
