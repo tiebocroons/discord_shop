@@ -1,3 +1,25 @@
+<?php
+require_once __DIR__ . "/db_connect.php";
+require_once __DIR__ . "/classes/ReviewManager.php";
+
+// Fetch product details
+$productId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$product = null;
+
+if ($productId > 0) {
+    $stmt = $conn->prepare('SELECT name, description, price FROM products WHERE id = ?');
+    $stmt->bind_param('i', $productId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $product = $result->fetch_assoc();
+}
+
+if (!$product) {
+    echo "Product not found.";
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
