@@ -18,6 +18,10 @@ class ReviewManager {
     }
 
     public function addReview($userId, $productId, $comment) {
+        if (!$this->productExists($productId)) {
+            throw new Exception("Product not found.");
+        }
+
         $stmt = $this->conn->prepare('INSERT INTO product_reviews (user_id, product_id, comment) VALUES (?, ?, ?)');
         if (!$stmt) {
             throw new Exception("Prepare statement failed: " . $this->conn->errorInfo()[2]);
@@ -25,6 +29,15 @@ class ReviewManager {
         if (!$stmt->execute([$userId, $productId, $comment])) {
             throw new Exception("Execute statement failed: " . $stmt->errorInfo()[2]);
         }
+    }
+
+    private function productExists($productId) {
+        $stmt = $this->conn->prepare('SELECT id FROM products WHERE id = ?');
+        if (!$stmt) {
+            throw new Exception("Prepare statement failed: " . $this->conn->errorInfo()[2]);
+        }
+        $stmt->execute([$productId]);
+        return $stmt->fetch() !== false;
     }
 }
 ?>
