@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     $reviewManager = new ReviewManager($conn);
     try {
-        $reviewManager->addReview($data['user_id'], $data['product_id'], $data['rating'], $data['comment']);
+        $reviewManager->addReview($data['user_id'], $data['product_id'], null, $data['comment']);
         echo json_encode(['success' => true]);
     } catch (Exception $e) {
         error_log($e->getMessage());
@@ -61,7 +61,6 @@ $reviews = $reviewManager->fetchReviews($productId);
         <div id="review-list">
             <?php foreach ($reviews as $review): ?>
                 <div class="review-item">
-                    <strong>Rating:</strong> <?php echo htmlspecialchars($review['rating'], ENT_QUOTES, 'UTF-8'); ?><br>
                     <strong>Comment:</strong> <?php echo htmlspecialchars($review['comment'], ENT_QUOTES, 'UTF-8'); ?>
                 </div>
             <?php endforeach; ?>
@@ -70,8 +69,6 @@ $reviews = $reviewManager->fetchReviews($productId);
         <form id="review-form">
             <input type="hidden" id="user_id" value="<?php echo htmlspecialchars($_SESSION['user_id'], ENT_QUOTES, 'UTF-8'); ?>">
             <input type="hidden" id="product_id" value="<?php echo htmlspecialchars($productId, ENT_QUOTES, 'UTF-8'); ?>">
-            <label for="rating">Rating:</label>
-            <input type="number" id="rating" name="rating" min="1" max="5" required>
             <label for="comment">Comment:</label>
             <textarea id="comment" name="comment" required></textarea>
             <button type="submit">Submit Review</button>
@@ -86,19 +83,18 @@ $reviews = $reviewManager->fetchReviews($productId);
         // Handle review form submission
         $('#review-form').on('submit', function(event) {
             event.preventDefault();
-            const rating = $('#rating').val();
             const comment = $('#comment').val();
 
             $.ajax({
                 url: 'details.php',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ user_id: userId, product_id: productId, rating: rating, comment: comment }),
+                data: JSON.stringify({ user_id: userId, product_id: productId, comment: comment }),
                 success: function(data) {
                     if (data.success) {
                         const reviewList = $('#review-list');
                         const reviewItem = $('<div>').addClass('review-item');
-                        reviewItem.html(`<strong>Rating:</strong> ${rating} <br> <strong>Comment:</strong> ${comment}`);
+                        reviewItem.html(`<strong>Comment:</strong> ${comment}`);
                         reviewList.append(reviewItem);
                         $('#review-form')[0].reset();
                     } else {
