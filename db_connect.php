@@ -1,14 +1,20 @@
 <?php
-$host = "discordshop.railway.internal";   // Database host
-$dbname = "railway";  // database naam
-$username = "root";  // Database gebruikersnaam
-$password = "rLCyCNYAXMcMPUeNfjeAgyjxLPdOihTk";  // Database wachtwoord
+$host = 'discordshop.railway.internal';
+$db = 'railway';
+$user = 'root';
+$pass = 'rLCyCNYAXMcMPUeNfjeAgyjxLPdOihTk';
+$charset = 'utf8mb4';
 
-// Verbinding maken met MySQL database
-$conn = new mysqli($host, $username, $password, $dbname);
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
 
-// Controleer de verbinding
-if ($conn->connect_error) {
-    die("Verbinding met database mislukt: " . $conn->connect_error);
+try {
+    $conn = new PDO($dsn, $user, $pass, $options);
+} catch (\PDOException $e) {
+    throw new \PDOException($e->getMessage(), (int)$e->getCode());
 }
 ?>
