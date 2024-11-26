@@ -25,6 +25,11 @@ $conn = Database::getInstance()->getConnection();
 $product = null;
 
 $stmt = $conn->prepare('SELECT title, description, price, img_url FROM products WHERE id = ?');
+if (!$stmt) {
+    error_log("Prepare statement failed: " . $conn->errorInfo()[2]);
+    echo json_encode(['success' => false, 'error' => 'Prepare statement failed.']);
+    exit;
+}
 $stmt->execute([$productId]);
 $product = $stmt->fetch();
 
@@ -48,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $reviewManager = new ReviewManager();
             try {
                 $reviewManager->addReview($data['user_id'], $data['product_id'], $data['comment']);
-                echo json_encode(['success' => true]);
+                echo json_encode(['success' => true, 'logs' => $reviewManager->getLogs()]);
                 exit;
             } catch (Exception $e) {
                 error_log($e->getMessage());
@@ -144,6 +149,7 @@ $reviews = $reviewManager->fetchReviews($productId);
                         reviewList.append(reviewItem);
                         $('#review-form')[0].reset();
                     } else {
+                        console.error('Failed to submit review: ' + response.error); // Log the error for debugging
                         if (response.logs) {
                             response.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
                         }
