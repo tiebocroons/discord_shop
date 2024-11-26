@@ -44,15 +44,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     error_log("Received data: " . print_r($data, true)); // Log the received data for debugging
     if (isset($data['csrf_token'], $_SESSION['csrf_token']) && $data['csrf_token'] === $_SESSION['csrf_token']) {
-        if (isset($data['user_id'], $data['id'], $data['comment']) && 
+        if (isset($data['user_id'], $data['product_id'], $data['comment']) && 
             is_int($data['user_id']) && 
-            is_int($data['id']) && 
+            is_int($data['product_id']) && 
             is_string($data['comment']) && 
             !empty(trim($data['comment']))) {
             
             $reviewManager = new ReviewManager();
             try {
-                $reviewManager->addReview($data['user_id'], $data['id'], $data['comment']);
+                $reviewManager->addReview($data['user_id'], $data['product_id'], $data['comment']);
                 echo json_encode(['success' => true, 'logs' => $reviewManager->getLogs()]);
                 exit;
             } catch (Exception $e) {
@@ -125,7 +125,7 @@ $reviews = $reviewManager->fetchReviews($productId);
 
             console.log({
                 user_id: userId,
-                id: productId,
+                product_id: productId,
                 comment: comment,
                 csrf_token: csrfToken
             }); // Log the data being sent for debugging
@@ -136,7 +136,7 @@ $reviews = $reviewManager->fetchReviews($productId);
                 contentType: 'application/json',
                 data: JSON.stringify({
                     user_id: userId,
-                    id: productId,
+                    product_id: productId,
                     comment: comment,
                     csrf_token: csrfToken
                 }),
