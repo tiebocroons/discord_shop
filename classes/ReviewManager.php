@@ -1,11 +1,9 @@
 <?php
-require 'Database.php';
-
 class ReviewManager {
     private $conn;
 
-    public function __construct() {
-        $this->conn = Database::getInstance()->getConnection();
+    public function __construct($conn) {
+        $this->conn = $conn;
     }
 
     public function fetchReviews($productId) {
@@ -16,11 +14,10 @@ class ReviewManager {
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
-    public function addReview($userId, $productId, $rating, $comment) {
-        $stmt = $this->conn->prepare('INSERT INTO reviews (user_id, product_id, rating, comment) VALUES (?, ?, ?, ?)');
-        $stmt->bind_param('iiis', $userId, $productId, $rating, $comment);
+    public function addReview($productId, $rating, $comment) {
+        $stmt = $this->conn->prepare('INSERT INTO reviews (product_id, rating, comment) VALUES (?, ?, ?)');
+        $stmt->bind_param('iis', $productId, $rating, $comment);
         $stmt->execute();
-        return $stmt->insert_id;
     }
 }
 ?>
