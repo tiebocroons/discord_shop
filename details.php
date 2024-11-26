@@ -10,14 +10,14 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 if (!isset($_SESSION['user_id'])) {
-    echo "User not authenticated.";
+    echo json_encode(['success' => false, 'error' => 'User not authenticated.']);
     exit;
 }
 
 // Fetch product details from the database
 $productId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ["options" => ["min_range" => 1]]);
 if ($productId === false) {
-    echo "Invalid product ID.";
+    echo json_encode(['success' => false, 'error' => 'Invalid product ID.']);
     exit;
 }
 
@@ -30,7 +30,7 @@ $product = $stmt->fetch();
 
 if (!$product) {
     error_log("Product not found for ID: $productId");
-    echo "Product not found.";
+    echo json_encode(['success' => false, 'error' => 'Product not found.']);
     exit;
 }
 
@@ -54,10 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode(['success' => false, 'error' => $e->getMessage()]);
                 exit;
             }
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Invalid input.']);
+            exit;
         }
+    } else {
+        echo json_encode(['success' => false, 'error' => 'Invalid CSRF token.']);
+        exit;
     }
-    echo json_encode(['success' => false, 'error' => 'Invalid input or CSRF token.']);
-    exit;
 }
 
 // Fetch reviews
