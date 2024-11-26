@@ -4,8 +4,8 @@ require_once __DIR__ . "/Database.php";
 class ReviewManager {
     private $conn;
 
-    public function __construct($conn) {
-        $this->conn = $conn;
+    public function __construct() {
+        $this->conn = Database::getInstance()->getConnection();
     }
 
     public function fetchReviews($productId) {
@@ -27,7 +27,4 @@ class ReviewManager {
         }
     }
 }
-
-// Usage example
-$reviewManager = new ReviewManager($conn);
 ?>
