@@ -49,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode(['success' => true]);
                 exit;
             } catch (Exception $e) {
+                error_log($e->getMessage());
                 echo json_encode(['success' => false, 'error' => $e->getMessage()]);
                 exit;
             }
@@ -122,6 +123,7 @@ $reviews = $reviewManager->fetchReviews($productId);
                     csrf_token: csrfToken
                 }),
                 success: function(response) {
+                    console.log(response); // Log the response for debugging
                     if (response.success) {
                         const reviewList = $('#review-list');
                         const reviewItem = $('<div>').addClass('review-item');
@@ -133,6 +135,7 @@ $reviews = $reviewManager->fetchReviews($productId);
                     }
                 },
                 error: function(xhr, status, error) {
+                    console.error(xhr.responseText); // Log the error response for debugging
                     alert('An error occurred: ' + error);
                 }
             });
