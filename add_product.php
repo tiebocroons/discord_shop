@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db_connect.php'; // Include DB connection
+require_once 'classes/Database.php'; // Include DB connection
 require_once 'classes/User.php'; // Include User class
 
 // Create a User object to check if the user is an admin

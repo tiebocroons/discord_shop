@@ -29,19 +29,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
     <div class="signup-container">
-        <h1>Create an Account</h1>
-        <?php
-        if (isset($error)) {
-            echo "<p style='color: red;'>$error</p>";
-        }
-        ?>
-        <form method="POST" action="create_account.php">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="Enter your username" required>
-
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Enter your password" required>
-
+        <h1>Create Account</h1>
+        <?php if (isset($error)): ?>
+            <p class="error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></p>
+        <?php endif; ?>
+        <form method="POST" action="">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
             <button type="submit">Create Account</button>
         </form>
     </div>

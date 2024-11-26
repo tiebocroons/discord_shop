@@ -8,15 +8,21 @@ class Database {
     private $db_name = 'railway';  // Replace with your database name
     private $username = 'root';  // Replace with your database username
     private $password = 'rLCyCNYAXMcMPUeNfjeAgyjxLPdOihTk';  // Replace with your database password
+    private $charset = 'utf8mb4';
 
     // Private constructor to prevent direct instantiation
     private function __construct() {
-        // Create the database connection
-        $this->conn = new mysqli($this->host, $this->username, $this->password, $this->db_name);
+        $dsn = "mysql:host=$this->host;dbname=$this->db_name;charset=$this->charset";
+        $options = [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ];
 
-        // Check if the connection has any errors
-        if ($this->conn->connect_error) {
-            die("Database connection failed: " . $this->conn->connect_error);
+        try {
+            $this->conn = new PDO($dsn, $this->username, $this->password, $options);
+        } catch (PDOException $e) {
+            throw new PDOException($e->getMessage(), (int)$e->getCode());
         }
     }
 
@@ -31,13 +37,6 @@ class Database {
     // Method to get the connection object
     public function getConnection() {
         return $this->conn;
-    }
-
-    // Method to close the connection
-    public function closeConnection() {
-        if ($this->conn != null) {
-            $this->conn->close();
-        }
     }
 
     // Prevent cloning of the object
