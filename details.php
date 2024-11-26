@@ -8,8 +8,10 @@ $product = null;
 
 if ($productId > 0) {
     $stmt = $conn->prepare('SELECT title, description, price, img_url FROM products WHERE id = ?');
-    $stmt->execute([$productId]);
-    $product = $stmt->fetch();
+    $stmt->bind_param('i', $productId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $product = $result->fetch_assoc();
 }
 
 if (!$product) {
