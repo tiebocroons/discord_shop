@@ -29,6 +29,7 @@ $stmt->execute([$productId]);
 $product = $stmt->fetch();
 
 if (!$product) {
+    error_log("Product not found for ID: $productId");
     echo "Product not found.";
     exit;
 }
