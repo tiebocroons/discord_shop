@@ -40,7 +40,7 @@ $result = $stmt->get_result();
 </head>
 <body>
     <div class="container">
-        <h1>Welcome, <?php echo htmlspecialchars($user->getUsername()); ?>!</h1>
+        <h1>Welcome, <?php echo htmlspecialchars($user->getUsername(), ENT_QUOTES, 'UTF-8'); ?>!</h1>
         <p>You are successfully logged in.</p>
         
         <!-- Admin check for navigation -->
@@ -57,9 +57,9 @@ $result = $stmt->get_result();
                 <option value="">All</option>
                 <?php if ($categoryResult->num_rows > 0): ?>
                     <?php while ($row = $categoryResult->fetch_assoc()): ?>
-                        <option value="<?php echo htmlspecialchars($row['category']); ?>" 
+                        <option value="<?php echo htmlspecialchars($row['category'], ENT_QUOTES, 'UTF-8'); ?>" 
                             <?php echo ($category === $row['category']) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($row['category']); ?>
+                            <?php echo htmlspecialchars($row['category'], ENT_QUOTES, 'UTF-8'); ?>
                         </option>
                     <?php endwhile; ?>
                 <?php endif; ?>
@@ -72,11 +72,11 @@ $result = $stmt->get_result();
             <?php if ($result->num_rows > 0): ?>
                 <?php while ($product = $result->fetch_assoc()): ?>
                     <div class="product-item">
-                        <img src="<?php echo htmlspecialchars($product['img_url']); ?>" alt="<?php echo htmlspecialchars($product['title']); ?>" />
-                        <h3><?php echo htmlspecialchars($product['title']); ?></h3>
-                        <p><?php echo htmlspecialchars($product['description']); ?></p>
-                        <p><strong>Price:</strong> <?php echo $product['price']; ?> units</p>
-                        <a href="product.php?id=<?php echo $product['id']; ?>">View Details</a>
+                        <img src="<?php echo htmlspecialchars($product['img_url'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($product['title'], ENT_QUOTES, 'UTF-8'); ?>" />
+                        <h3><?php echo htmlspecialchars($product['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                        <p><?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p><strong>Price:</strong> <?php echo htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8'); ?> units</p>
+                        <a href="product.php?id=<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>">View Details</a>
                     </div>
                 <?php endwhile; ?>
             <?php else: ?>

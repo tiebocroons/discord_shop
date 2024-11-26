@@ -1,102 +1,52 @@
 <?php
-require_once 'Database.php'; // Include the database connection
+require_once __DIR__ . "/../db_connect.php";
 
 class User {
-    private $db;
-    private $userId;
-    private $username;
-    private $isAdmin;
+    private $conn;
 
     public function __construct() {
-        // Initialize the database connection using the Database class
-        $this->db = Database::getInstance()->getConnection();
-
-        // Check if the user is already logged in by checking session data
-        if (isset($_SESSION['user_id'])) {
-            $this->userId = $_SESSION['user_id'];
-            $this->username = $_SESSION['username'];
-            $this->isAdmin = $_SESSION['is_admin']; // Should now be a boolean
-        }
+        $this->conn = Database::getInstance()->getConnection();
     }
 
-    // Method to check if user is logged in
-    public function isLoggedIn() {
-        return isset($this->userId);
-    }
-
-    // Method to get the logged-in user's username
-    public function getUsername() {
-        return $this->username;
-    }
-
-    // Method to check if the logged-in user is an admin
-    public function isAdmin() {
-        return (bool)$this->isAdmin; // Ensure it's returned as a boolean
-    }
-
-    // Method to create a new user (without email)
-    public function createUser($username, $password) {
-        // Check if the username is already in use
-        $sql = "SELECT username FROM users WHERE username = ?";
-        $stmt = $this->db->prepare($sql);
+    public function loginUser($username, $password) {
+        $stmt = $this->conn->prepare('SELECT id, password FROM users WHERE username = ?');
         $stmt->bind_param('s', $username);
         $stmt->execute();
         $stmt->store_result();
 
         if ($stmt->num_rows > 0) {
-            return false; // Username is already in use
-        }
-
-        // Hash the password
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-        // Insert the new user into the database
-        $sql = "INSERT INTO users (username, password, is_admin) VALUES (?, ?, FALSE)"; // Default is_admin to FALSE
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param('ss', $username, $hashed_password);
-
-        return $stmt->execute();
-    }
-
-    // Method to login a user
-    public function login($username, $password) {
-        global $conn; // Assuming $conn is the database connection
-    
-        $sql = "SELECT id, username, password, is_admin FROM users WHERE username = ?";
-        $stmt = $conn->prepare($sql);
-        if ($stmt === false) {
-            die('Prepare failed: ' . htmlspecialchars($conn->error));
-        }
-    
-        $stmt->bind_param('s', $username);
-        $stmt->execute();
-        $stmt->store_result();
-    
-        if ($stmt->num_rows == 1) {
-            // Bind the results to variables
-            $stmt->bind_result($userId, $dbUsername, $dbPassword, $isAdmin);
+            $stmt->bind_result($id, $hashedPassword);
             $stmt->fetch();
-    
-            // Verify the password
-            if (password_verify($password, $dbPassword)) {
-                // Store user data in the session
-                $_SESSION['user_id'] = $userId;
-                $_SESSION['username'] = $dbUsername;
-                $_SESSION['is_admin'] = (bool)$isAdmin; // Store as boolean
-    
-                return true; // Successful login
-            } else {
-                return false; // Invalid password
+
+            if (password_verify($password, $hashedPassword)) {
+                $_SESSION['user_id'] = $id;
+                return true;
             }
-        } else {
-            return false; // User not found
         }
+
+        return false;
     }
 
-    // Method to logout the user
-    public function logout() {
-        session_unset();
-        session_destroy();
+    public function isLoggedIn() {
+        return isset($_SESSION['user_id']);
+    }
+
+    public function getUsername() {
+        $stmt = $this->conn->prepare('SELECT username FROM users WHERE id = ?');
+        $stmt->bind_param('i', $_SESSION['user_id']);
+        $stmt->execute();
+        $stmt->bind_result($username);
+        $stmt->fetch();
+        return $username;
+    }
+
+    public function isAdmin() {
+        $stmt = $this->conn->prepare('SELECT is_admin FROM users WHERE id = ?');
+        $stmt->bind_param('i', $_SESSION['user_id']);
+        $stmt->execute();
+        $stmt->bind_result($isAdmin);
+        $stmt->fetch();
+        return $isAdmin;
     }
 }
 ?>

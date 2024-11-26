@@ -1,31 +1,26 @@
 <?php
-require 'db_connect.php';
+require 'Database.php';
 
 class ReviewManager {
-    private $pdo;
+    private $conn;
 
-    public function __construct($pdo) {
-        $this->pdo = $pdo;
+    public function __construct() {
+        $this->conn = Database::getInstance()->getConnection();
     }
 
     public function fetchReviews($productId) {
-        $stmt = $this->pdo->prepare('SELECT rating, comment FROM reviews WHERE product_id = :product_id');
-        $stmt->execute(['product_id' => $productId]);
-        return $stmt->fetchAll();
+        $stmt = $this->conn->prepare('SELECT rating, comment FROM reviews WHERE product_id = ?');
+        $stmt->bind_param('i', $productId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
     }
 
     public function addReview($userId, $productId, $rating, $comment) {
-        $stmt = $this->pdo->prepare('INSERT INTO reviews (user_id, product_id, rating, comment) VALUES (:user_id, :product_id, :rating, :comment)');
-        $stmt->execute([
-            'user_id' => $userId,
-            'product_id' => $productId,
-            'rating' => $rating,
-            'comment' => $comment
-        ]);
-        return $this->pdo->lastInsertId();
+        $stmt = $this->conn->prepare('INSERT INTO reviews (user_id, product_id, rating, comment) VALUES (?, ?, ?, ?)');
+        $stmt->bind_param('iiis', $userId, $productId, $rating, $comment);
+        $stmt->execute();
+        return $stmt->insert_id;
     }
 }
-
-// Usage example
-$reviewManager = new ReviewManager($pdo);
 ?>

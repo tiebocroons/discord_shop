@@ -1,37 +1,3 @@
-<?php
-require 'db_connect.php';
-require 'ReviewManager.php';
-
-$reviewManager = new ReviewManager($pdo);
-
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['product_id'])) {
-    $productId = $_GET['product_id'];
-    echo json_encode($reviewManager->fetchReviews($productId));
-    exit;
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    session_start(); // Assuming user_id is stored in session
-    $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null; // Replace with your logic to fetch user_id
-    $data = json_decode(file_get_contents('php://input'), true);
-
-    $productId = $data['product_id'];
-    $rating = $data['rating'];
-    $comment = $data['comment'];
-
-    $reviewId = $reviewManager->addReview($userId, $productId, $rating, $comment);
-    echo json_encode(['success' => true, 'review_id' => $reviewId]);
-    exit;
-}
-
-// Fetch product details (mock example)
-$productId = isset($_GET['id']) ? $_GET['id'] : 1; // Example product ID
-$product = [
-    'id' => $productId,
-    'name' => 'Discord Nitro',
-    'description' => 'This is Discord Nitro',
-    'price' => '10.00 units'
-];
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,9 +8,9 @@ $product = [
 <body>
     <!-- Product Details Section -->
     <div id="product-details">
-        <h1><?php echo $product['name']; ?></h1>
-        <p><?php echo $product['description']; ?></p>
-        <p><strong>Price:</strong> <?php echo $product['price']; ?></p>
+        <h1><?php echo htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8'); ?></h1>
+        <p><?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></p>
+        <p><strong>Price:</strong> <?php echo htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8'); ?></p>
         <button id="view-details">View Details</button>
     </div>
 
@@ -54,7 +20,7 @@ $product = [
         <div id="review-list"></div>
         <h3>Add a Review</h3>
         <form id="review-form">
-            <input type="hidden" id="product_id" value="<?php echo $productId; ?>">
+            <input type="hidden" id="product_id" value="<?php echo htmlspecialchars($productId, ENT_QUOTES, 'UTF-8'); ?>">
             <label for="rating">Rating:</label>
             <input type="number" id="rating" name="rating" min="1" max="5" required>
             <label for="comment">Comment:</label>

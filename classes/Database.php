@@ -43,5 +43,4 @@ class Database {
     // Prevent cloning of the object
     private function __clone() { }
 }
-
 ?>
