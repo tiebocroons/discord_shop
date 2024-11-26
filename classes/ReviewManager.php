@@ -7,7 +7,7 @@ class ReviewManager {
     }
 
     public function fetchReviews($productId) {
-        $stmt = $this->conn->prepare('SELECT rating, comment FROM product_reviews WHERE product_id = ?');
+        $stmt = $this->conn->prepare('SELECT comment FROM product_reviews WHERE product_id = ?');
         $stmt->bind_param('i', $productId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -15,11 +15,11 @@ class ReviewManager {
     }
 
     public function addReview($userId, $productId, $rating, $comment) {
-        $stmt = $this->conn->prepare('INSERT INTO product_reviews (user_id, product_id, rating, comment) VALUES (?, ?, ?, ?)');
+        $stmt = $this->conn->prepare('INSERT INTO product_reviews (user_id, product_id, comment) VALUES (?, ?, ?)');
         if (!$stmt) {
             throw new Exception($this->conn->error);
         }
-        $stmt->bind_param('iiis', $userId, $productId, $rating, $comment);
+        $stmt->bind_param('iis', $userId, $productId, $comment);
         if (!$stmt->execute()) {
             throw new Exception($stmt->error);
         }
