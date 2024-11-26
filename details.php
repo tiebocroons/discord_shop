@@ -6,6 +6,8 @@ require_once __DIR__ . "/classes/ReviewManager.php";
 $productId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $product = null;
 
+$conn = Database::getInstance()->getConnection();
+
 if ($productId > 0) {
     $stmt = $conn->prepare('SELECT title, description, price, img_url FROM products WHERE id = ?');
     $stmt->execute([$productId]);
@@ -20,7 +22,7 @@ if (!$product) {
 // Handle review submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
-    $reviewManager = new ReviewManager($conn);
+    $reviewManager = new ReviewManager();
     try {
         $reviewManager->addReview($data['user_id'], $data['product_id'], $data['comment']);
         echo json_encode(['success' => true]);
@@ -32,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch reviews
-$reviewManager = new ReviewManager($conn);
+$reviewManager = new ReviewManager();
 $reviews = $reviewManager->fetchReviews($productId);
 ?>
 
