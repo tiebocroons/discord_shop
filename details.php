@@ -39,6 +39,7 @@ $reviews = $reviewManager->fetchReviews($productId);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <!-- Product Details Section -->
@@ -73,34 +74,31 @@ $reviews = $reviewManager->fetchReviews($productId);
     </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const userId = document.getElementById('user_id').value;
-        const productId = document.getElementById('product_id').value;
+    $(document).ready(function() {
+        const userId = $('#user_id').val();
+        const productId = $('#product_id').val();
 
         // Handle review form submission
-        document.getElementById('review-form').addEventListener('submit', function(event) {
+        $('#review-form').on('submit', function(event) {
             event.preventDefault();
-            const rating = document.getElementById('rating').value;
-            const comment = document.getElementById('comment').value;
+            const rating = $('#rating').val();
+            const comment = $('#comment').val();
 
-            fetch('details.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ user_id: userId, product_id: productId, rating: rating, comment: comment })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const reviewList = document.getElementById('review-list');
-                    const reviewItem = document.createElement('div');
-                    reviewItem.classList.add('review-item');
-                    reviewItem.innerHTML = `<strong>Rating:</strong> ${rating} <br> <strong>Comment:</strong> ${comment}`;
-                    reviewList.appendChild(reviewItem);
-                    document.getElementById('review-form').reset();
-                } else {
-                    alert('Failed to submit review');
+            $.ajax({
+                url: 'details.php',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ user_id: userId, product_id: productId, rating: rating, comment: comment }),
+                success: function(data) {
+                    if (data.success) {
+                        const reviewList = $('#review-list');
+                        const reviewItem = $('<div>').addClass('review-item');
+                        reviewItem.html(`<strong>Rating:</strong> ${rating} <br> <strong>Comment:</strong> ${comment}`);
+                        reviewList.append(reviewItem);
+                        $('#review-form')[0].reset();
+                    } else {
+                        alert('Failed to submit review');
+                    }
                 }
             });
         });
