@@ -14,7 +14,7 @@ class ReviewManager {
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
-    public function addReview($userId, $productId, $rating, $comment) {
+    public function addReview($userId, $productId, $comment) {
         $stmt = $this->conn->prepare('INSERT INTO product_reviews (user_id, product_id, comment) VALUES (?, ?, ?)');
         if (!$stmt) {
             throw new Exception($this->conn->error);
