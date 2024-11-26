@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $reviewManager = new ReviewManager();
             try {
                 $reviewManager->addReview($data['user_id'], $data['product_id'], $data['comment']);
-                echo json_encode(['success' => true, 'logs' => $reviewManager->getLogs()]);
+                echo json_encode(['success' => true]);
                 exit;
             } catch (Exception $e) {
                 error_log($e->getMessage());
@@ -67,7 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch reviews
 $reviewManager = new ReviewManager();
-$reviews = $reviewManager->fetchReviews($productId);
+if ($productId !== false) {
+    $reviews = $reviewManager->fetchReviews($productId);
+} else {
+    $reviews = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
