@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . "/classes/User.php"; // Include User class
-require_once __DIR__ . "/db_connect.php"; // Include DB connection
+require_once __DIR__ . "/classes/Database.php"; // Include DB connection
 
 // Create User instance and check if user is logged in
 $user = new User();
