@@ -16,8 +16,13 @@ class ReviewManager {
 
     public function addReview($userId, $productId, $rating, $comment) {
         $stmt = $this->conn->prepare('INSERT INTO product_reviews (user_id, product_id, rating, comment) VALUES (?, ?, ?, ?)');
+        if (!$stmt) {
+            throw new Exception($this->conn->error);
+        }
         $stmt->bind_param('iiis', $userId, $productId, $rating, $comment);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            throw new Exception($stmt->error);
+        }
     }
 }
 ?>
