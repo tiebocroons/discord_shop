@@ -37,6 +37,7 @@ if (!$product) {
 // Handle review submission via POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
+    error_log("Received data: " . print_r($data, true)); // Log the received data for debugging
     if (isset($data['csrf_token'], $_SESSION['csrf_token']) && $data['csrf_token'] === $_SESSION['csrf_token']) {
         if (isset($data['user_id'], $data['product_id'], $data['comment']) && 
             is_int($data['user_id']) && 
@@ -116,6 +117,13 @@ $reviews = $reviewManager->fetchReviews($productId);
             event.preventDefault();
             const comment = $('#comment').val();
             const csrfToken = $('#csrf_token').val();
+
+            console.log({
+                user_id: userId,
+                product_id: productId,
+                comment: comment,
+                csrf_token: csrfToken
+            }); // Log the data being sent for debugging
 
             $.ajax({
                 url: 'details.php',
