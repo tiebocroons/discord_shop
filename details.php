@@ -67,11 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch reviews
 $reviewManager = new ReviewManager();
-if ($productId !== false) {
-    $reviews = $reviewManager->fetchReviews($productId);
-} else {
-    $reviews = [];
-}
+$reviews = $reviewManager->fetchReviews($productId);
 ?>
 <!DOCTYPE html>
 <html lang="en">
