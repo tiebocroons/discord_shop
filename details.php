@@ -109,8 +109,8 @@ $reviews = $reviewManager->fetchReviews($productId);
 
     <script>
     $(document).ready(function() {
-        const userId = $('#user_id').val();
-        const productId = $('#product_id').val();
+        const userId = parseInt($('#user_id').val(), 10);
+        const productId = parseInt($('#product_id').val(), 10);
 
         // Handle review form submission
         $('#review-form').on('submit', function(event) {
