@@ -48,11 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $reviewManager = new ReviewManager();
             try {
                 $reviewManager->addReview($data['user_id'], $data['product_id'], $data['comment']);
-                echo json_encode(['success' => true]);
+                echo json_encode(['success' => true, 'logs' => $reviewManager->getLogs()]);
                 exit;
             } catch (Exception $e) {
                 error_log($e->getMessage());
-                echo json_encode(['success' => false, 'error' => $e->getMessage(), 'log' => $e->getMessage()]);
+                echo json_encode(['success' => false, 'error' => $e->getMessage(), 'logs' => $reviewManager->getLogs()]);
                 exit;
             }
         } else {
@@ -145,8 +145,8 @@ $reviews = $reviewManager->fetchReviews($productId);
                         $('#review-form')[0].reset();
                     } else {
                         console.error('Failed to submit review: ' + response.error); // Log the error for debugging
-                        if (response.log) {
-                            console.error('Server log: ' + response.log); // Log the server log for debugging
+                        if (response.logs) {
+                            response.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
                         }
                         alert('Failed to submit review: ' + response.error);
                     }
