@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     $reviewManager = new ReviewManager($conn);
     try {
-        $reviewManager->addReview($data['user_id'], $data['product_id'], null, $data['comment']);
+        $reviewManager->addReview($data['user_id'], $data['product_id'], $data['comment']);
         echo json_encode(['success' => true]);
     } catch (Exception $e) {
         error_log($e->getMessage());
