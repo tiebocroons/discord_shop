@@ -22,13 +22,7 @@ if ($productId === false) {
     exit;
 }
 
-try {
-    $conn = Database::getInstance()->getConnection();
-} catch (Exception $e) {
-    error_log("Database connection failed: " . $e->getMessage());
-    echo json_encode(['success' => false, 'error' => 'Database connection failed.']);
-    exit;
-}
+$conn = Database::getInstance()->getConnection();
 $product = null;
 
 $stmt = $conn->prepare('SELECT title, description, price, img_url FROM products WHERE id = ?');
@@ -86,36 +80,91 @@ $reviews = $reviewManager->fetchReviews($productId);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <!-- Add your CSS and other head elements here -->
+    <title>Product Details</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Ensure jQuery is loaded -->
 </head>
 <body>
-    <!-- Your body content goes here -->
+    <!-- Product Details Section -->
+    <div id="product-details">
+        <h1><?php echo htmlspecialchars($product['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
+        <img src="<?php echo htmlspecialchars($product['img_url'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($product['title'], ENT_QUOTES, 'UTF-8'); ?>" />
+        <p><?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></p>
+        <p><strong>Price:</strong> <?php echo htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8'); ?></p>
+    </div>
+
+    <!-- Add the review section here -->
+    <div id="reviews">
+        <h2>Reviews</h2>
+        <div id="review-list">
+            <?php foreach ($reviews as $review): ?>
+                <div class="review-item">
+                    <strong>Comment:</strong> <?php echo htmlspecialchars($review['comment'], ENT_QUOTES, 'UTF-8'); ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <h3>Add a Review</h3>
+        <form id="review-form">
+            <input type="hidden" id="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+            <input type="hidden" id="user_id" value="<?php echo htmlspecialchars($_SESSION['user_id'], ENT_QUOTES, 'UTF-8'); ?>">
+            <input type="hidden" id="product_id" value="<?php echo htmlspecialchars($productId, ENT_QUOTES, 'UTF-8'); ?>">
+            <label for="comment">Comment:</label>
+            <textarea id="comment" name="comment" required></textarea>
+            <button type="submit">Submit Review</button>
+        </form>
+    </div>
 
     <script>
-        $(document).ready(function() {
-            $('#submitReview').click(function(event) {
-                event.preventDefault();
-                $.ajax({
-                    type: 'POST',
-                    url: 'submit_review.php',
-                    data: $('#reviewForm').serialize(),
-                    success: function(response) {
-                        if (response.success) {
-                            alert('Review submitted successfully!');
-                        } else {
+    $(document).ready(function() {
+        const userId = parseInt($('#user_id').val(), 10);
+        const productId = parseInt($('#product_id').val(), 10);
+
+        // Handle review form submission
+        $('#review-form').on('submit', function(event) {
+            event.preventDefault();
+            const comment = $('#comment').val();
+            const csrfToken = $('#csrf_token').val();
+
+            console.log({
+                user_id: userId,
+                product_id: productId,
+                comment: comment,
+                csrf_token: csrfToken
+            }); // Log the data being sent for debugging
+
+            $.ajax({
+                url: 'details.php',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    user_id: userId,
+                    product_id: productId,
+                    comment: comment,
+                    csrf_token: csrfToken
+                }),
+                success: function(response) {
+                    console.log(response); // Log the response for debugging
+                    if (response.success) {
+                        const reviewList = $('#review-list');
+                        const reviewItem = $('<div>').addClass('review-item');
+                        reviewItem.html(`<strong>Comment:</strong> ${comment}`);
+                        reviewList.append(reviewItem);
+                        $('#review-form')[0].reset();
+                    } else {
+                        console.error('Failed to submit review: ' + response.error); // Log the error for debugging
+                        if (response.logs) {
                             response.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
                         }
                         alert('Failed to submit review: ' + response.error);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('AJAX error: ' + error); // Log the AJAX error for debugging
-                        console.error('Response text: ' + xhr.responseText); // Log the response text for debugging
-                        alert('An error occurred: ' + error);
                     }
-                });
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error: ' + error); // Log the AJAX error for debugging
+                    console.error('Response text: ' + xhr.responseText); // Log the response text for debugging
+                    alert('An error occurred: ' + error);
+                }
             });
         });
+    });
     </script>
 </body>
 </html>
