@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             } catch (Exception $e) {
                 error_log($e->getMessage());
-                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                echo json_encode(['success' => false, 'error' => $e->getMessage(), 'log' => $e->getMessage()]);
                 exit;
             }
         } else {
@@ -145,6 +145,9 @@ $reviews = $reviewManager->fetchReviews($productId);
                         $('#review-form')[0].reset();
                     } else {
                         console.error('Failed to submit review: ' + response.error); // Log the error for debugging
+                        if (response.log) {
+                            console.error('Server log: ' + response.log); // Log the server log for debugging
+                        }
                         alert('Failed to submit review: ' + response.error);
                     }
                 },
