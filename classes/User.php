@@ -33,7 +33,7 @@ class User {
     }
 
     public function getUsername() {
-        $stmt = $this->conn->prepare('SELECT username FROM users WHERE id = ?');
+        $stmt = $this->conn->prepare('SELECT username FROM users WHERE user_id = ?');
         $stmt->bind_param('i', $_SESSION['user_id']);
         $stmt->execute();
         $stmt->bind_result($username);
@@ -42,7 +42,7 @@ class User {
     }
 
     public function isAdmin() {
-        $stmt = $this->conn->prepare('SELECT is_admin FROM users WHERE id = ?');
+        $stmt = $this->conn->prepare('SELECT is_admin FROM users WHERE user_id = ?');
         $stmt->bind_param('i', $_SESSION['user_id']);
         $stmt->execute();
         $stmt->bind_result($isAdmin);
