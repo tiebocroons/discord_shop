@@ -9,16 +9,26 @@ $(document).ready(function() {
             comment: $('#comment').val()
         };
 
+        console.log(formData); // Log the data being sent for debugging
+
         $.ajax({
             type: 'POST',
             url: 'details.php',
             data: JSON.stringify(formData),
             contentType: 'application/json',
             success: function(response) {
+                console.log(response); // Log the response for debugging
                 if (response.success) {
-                    alert('Review submitted successfully!');
-                    location.reload(); // Reload the page to show the new review
+                    const reviewList = $('#review-list');
+                    const reviewItem = $('<div>').addClass('review-item');
+                    reviewItem.html(`<strong>Comment:</strong> ${formData.comment}`);
+                    reviewList.append(reviewItem);
+                    $('#review-form')[0].reset();
                 } else {
+                    console.error('Failed to submit review: ' + response.error); // Log the error for debugging
+                    if (response.logs) {
+                        response.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
+                    }
                     alert('Failed to submit review: ' + response.error);
                 }
             },
