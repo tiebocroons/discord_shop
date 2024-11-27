@@ -82,6 +82,7 @@ $reviews = $reviewManager->fetchReviews($productId);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Ensure jQuery is loaded -->
+    <script src="../classes/js/review_handling.js"></script> <!-- Include the external JavaScript file -->
 </head>
 <body>
     <!-- Product Details Section -->
@@ -112,7 +113,5 @@ $reviews = $reviewManager->fetchReviews($productId);
             <button type="submit">Submit Review</button>
         </form>
     </div>
-
-    <script src="../classes/js/review_handling.js"></script>
 </body>
 </html>
