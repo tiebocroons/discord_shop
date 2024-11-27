@@ -42,28 +42,14 @@ class ReviewManager {
     }
 
     private function productExists($productId) {
-        $productId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ["options" => ["min_range" => 1]]);
-
-            if ($productId === false) {
-                echo "Invalid product ID.";
-                exit;
-            }
-
-            $stmt = $this->conn->prepare('SELECT id FROM products WHERE id = ?');
-            if (!$stmt) {
-             // Handle error - the prepare failed
-             echo "Prepare statement failed: " . $this->conn->errorInfo()[2];
-             exit;
-            }
-
-            $stmt->execute([$productId]);
-            $productExists = $stmt->fetch() !== false;
-
-            if ($productExists) {
-                echo "Product found.";
-            } else {
-                echo "Product not found.";
-            }
+        $this->log("Checking if product ID: $productId exists");
+        $stmt = $this->conn->prepare('SELECT id FROM products WHERE id = ?');
+        if (!$stmt) {
+            $this->log("Prepare statement failed: " . $this->conn->errorInfo()[2]);
+            throw new Exception("Prepare statement failed: " . $this->conn->errorInfo()[2]);
+        }
+        $stmt->execute([$productId]);
+        return $stmt->fetch() !== false;
     }
 
     private function log($message) {
