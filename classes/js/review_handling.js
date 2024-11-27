@@ -46,14 +46,14 @@ $(document).ready(function() {
                     }                    
                 }
             },
-            error: function(xhr, status, error) {
+            error: function(xhr, error) {
                 console.error('AJAX error: ' + error); // Log the AJAX error for debugging
                 console.error('Response text: ' + xhr.responseText); // Log the response text for debugging
                 alert('An error occurred: ' + error);
             }
         }).done(function() {
             console.log("Request completed");
-        }).fail(function(jqXHR, textStatus) {
+        }).fail(function(textStatus) {
             console.error("Request failed: " + textStatus);
         }).always(function() {
 console.log("Request ended");
