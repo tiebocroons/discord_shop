@@ -113,6 +113,6 @@ $reviews = $reviewManager->fetchReviews($productId);
         </form>
     </div>
 
-    <script src="../discord_shop/classes/js/review_handling.js"></script>
+    <script src="../classes/js/review_handling.js"></script>
 </body>
 </html>
