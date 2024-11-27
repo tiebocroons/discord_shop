@@ -1,62 +1,32 @@
 $(document).ready(function() {
-    const userId = parseInt($('#user_id').val(), 10);
-    const productId = parseInt($('#product_id').val(), 10);
-
-    // Handle review form submission
-    $('#review-form').on('submit', function(event) {
+    $('#review-form').submit(function(event) {
         event.preventDefault();
-        const comment = $('#comment').val();
-        const csrfToken = $('#csrf_token').val();
-
-        console.log({
-            user_id: userId,
-            product_id: productId,
-            comment: comment,
-            csrf_token: csrfToken
-        }); // Log the data being sent for debugging
+        
+        const formData = {
+            csrf_token: $('input[name="csrf_token"]').val(),
+            user_id: $('input[name="user_id"]').val(),
+            product_id: $('input[name="product_id"]').val(),
+            comment: $('#comment').val()
+        };
 
         $.ajax({
-            url: 'details.php',
             type: 'POST',
+            url: 'details.php',
+            data: JSON.stringify(formData),
             contentType: 'application/json',
-            data: JSON.stringify({
-                user_id: userId,
-                product_id: productId,
-                comment: comment,
-                csrf_token: csrfToken
-            }),
             success: function(response) {
-                console.log(response); // Log the response for debugging
                 if (response.success) {
-                    if (response.success) {
-                        const reviewList = $('#review-list');
-                        const reviewItem = $('<div>').addClass('review-item');
-                        reviewItem.html(`<strong>Comment:</strong> ${comment}`);
-                        reviewList.append(reviewItem);
-                        $('#review-form')[0].reset();
+                    alert('Review submitted successfully!');
+                    location.reload(); // Reload the page to show the new review
                 } else {
-                    console.error('Failed to submit review: ' + response.error); // Log the error for debugging
-                    if (response.logs) {
-                        response.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
-                    }                  
+                    alert('Failed to submit review: ' + response.error);
                 }
-                } else {
-                    console.error('Invalid CSRF token.');
-                    alert('Invalid CSRF token.');
-                }  
-                
             },
-            error: function(xhr, error) {
+            error: function(xhr, status, error) {
                 console.error('AJAX error: ' + error); // Log the AJAX error for debugging
                 console.error('Response text: ' + xhr.responseText); // Log the response text for debugging
                 alert('An error occurred: ' + error);
             }
-        }).done(function() {
-            console.log("Request completed");
-        }).fail(function(textStatus) {
-            console.error("Request failed: " + textStatus);
-        }).always(function() {
-console.log("Request ended");
         });
     });
 });
