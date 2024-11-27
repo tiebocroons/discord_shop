@@ -9,7 +9,7 @@ $(document).ready(function() {
             comment: $('#comment').val()
         };
 
-        console.log(formData); // Log the data being sent for debugging
+        console.log("Form data being sent:", formData); // Log the data being sent for debugging
 
         $.ajax({
             type: 'POST',
