@@ -38,7 +38,12 @@ $(document).ready(function() {
                     if (response.logs) {
                         response.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
                     }
-                    alert('Failed to submit review: ' + response.error);
+                    if (isset($data['csrf_token'], $_SESSION['csrf_token']) && $data['csrf_token'] === $_SESSION['csrf_token']) {
+                        // Proceed with the review submission
+                    } else {
+                        console.error('Invalid CSRF token.');
+                        alert('Invalid CSRF token.');
+                    }                    
                 }
             },
             error: function(xhr, status, error) {

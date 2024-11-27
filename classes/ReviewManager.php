@@ -49,7 +49,6 @@ class ReviewManager {
                 exit;
             }
 
-
             $stmt = $this->conn->prepare('SELECT id FROM products WHERE id = ?');
             if (!$stmt) {
              // Handle error - the prepare failed
