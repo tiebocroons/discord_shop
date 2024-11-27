@@ -104,7 +104,7 @@ $reviews = $reviewManager->fetchReviews($productId);
         </div>
         <h3>Add a Review</h3>
         <form id="review-form">
-            <input type="hidden" id="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+            <input type="hidden" id="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
             <input type="hidden" id="user_id" value="<?php echo htmlspecialchars($_SESSION['user_id'], ENT_QUOTES, 'UTF-8'); ?>">
             <input type="hidden" id="product_id" value="<?php echo htmlspecialchars($productId, ENT_QUOTES, 'UTF-8'); ?>">
             <label for="comment">Comment:</label>
