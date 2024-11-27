@@ -27,24 +27,24 @@ $(document).ready(function() {
             }),
             success: function(response) {
                 console.log(response); // Log the response for debugging
-                if (response.success) {
-                    const reviewList = $('#review-list');
-                    const reviewItem = $('<div>').addClass('review-item');
-                    reviewItem.html(`<strong>Comment:</strong> ${comment}`);
-                    reviewList.append(reviewItem);
-                    $('#review-form')[0].reset();
-                } else {
-                    console.error('Failed to submit review: ' + response.error); // Log the error for debugging
-                    if (response.logs) {
-                        response.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
-                    }
-                    if (isset($data['csrf_token'], $_SESSION['csrf_token']) && $data['csrf_token'] === $_SESSION['csrf_token']) {
-                        // Proceed with the review submission
+                if (isset($data['csrf_token'], $_SESSION['csrf_token']) && $data['csrf_token'] === $_SESSION['csrf_token']) {
+                    if (response.success) {
+                        const reviewList = $('#review-list');
+                        const reviewItem = $('<div>').addClass('review-item');
+                        reviewItem.html(`<strong>Comment:</strong> ${comment}`);
+                        reviewList.append(reviewItem);
+                        $('#review-form')[0].reset();
                     } else {
-                        console.error('Invalid CSRF token.');
-                        alert('Invalid CSRF token.');
-                    }                    
+                            console.error('Failed to submit review: ' + response.error); // Log the error for debugging
+                        if (response.logs) {
+                            response.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
+                        }                  
                 }
+                } else {
+                    console.error('Invalid CSRF token.');
+                    alert('Invalid CSRF token.');
+                }  
+                
             },
             error: function(xhr, error) {
                 console.error('AJAX error: ' + error); // Log the AJAX error for debugging
