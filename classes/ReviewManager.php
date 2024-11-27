@@ -49,7 +49,9 @@ class ReviewManager {
             throw new Exception("Prepare statement failed: " . $this->conn->errorInfo()[2]);
         }
         $stmt->execute([$productId]);
-        return $stmt->fetch() !== false;
+        $product = $stmt->fetch();
+        $this->log("Product exists: " . ($product !== false ? "Yes" : "No"));
+        return $product !== false;
     }
 
     private function log($message) {
