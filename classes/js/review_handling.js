@@ -4,8 +4,8 @@ $(document).ready(function() {
         
         const formData = {
             csrf_token: $('input[name="csrf_token"]').val(),
-            user_id: $('input[name="user_id"]').val(),
-            product_id: $('input[name="product_id"]').val(),
+            user_id: parseInt($('input[name="user_id"]').val(), 10),
+            product_id: parseInt($('input[name="product_id"]').val(), 10),
             comment: $('#comment').val()
         };
 
