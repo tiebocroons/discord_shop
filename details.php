@@ -36,7 +36,7 @@ $product = $stmt->fetch();
 
 if (!$product) {
     error_log("Product not found for ID: $productId");
-    echo json_encode(['success' => false, 'error' => 'Product not found.']);
+    echo json_encode(['success' => false, 'error' => 'Product not found for ID $productId.']);
     exit;
 }
 
