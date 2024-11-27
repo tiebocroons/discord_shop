@@ -1,42 +1,44 @@
-$(document).ready(function() {
-    $('#review-form').submit(function(event) {
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('review-form').addEventListener('submit', function(event) {
         event.preventDefault();
         
         const formData = {
-            csrf_token: $('input[name="csrf_token"]').val(),
-            user_id: parseInt($('input[name="user_id"]').val(), 10),
-            product_id: parseInt($('input[name="product_id"]').val(), 10),
-            comment: $('#comment').val()
+            csrf_token: document.querySelector('input[name="csrf_token"]').value, // CSRF token as a string
+            user_id: parseInt(document.querySelector('input[name="user_id"]').value, 10), // Convert user_id to an integer
+            product_id: parseInt(document.querySelector('input[name="product_id"]').value, 10), // Convert product_id to an integer
+            comment: document.getElementById('comment').value
         };
 
         console.log("Form data being sent:", formData); // Log the data being sent for debugging
 
-        $.ajax({
-            type: 'POST',
-            url: 'details.php',
-            data: JSON.stringify(formData),
-            contentType: 'application/json',
-            success: function(response) {
-                console.log(response); // Log the response for debugging
-                if (response.success) {
-                    const reviewList = $('#review-list');
-                    const reviewItem = $('<div>').addClass('review-item');
-                    reviewItem.html(`<strong>Comment:</strong> ${formData.comment}`);
-                    reviewList.append(reviewItem);
-                    $('#review-form')[0].reset();
-                } else {
-                    console.error('Failed to submit review: ' + response.error); // Log the error for debugging
-                    if (response.logs) {
-                        response.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
-                    }
-                    alert('Failed to submit review: ' + response.error);
-                }
+        fetch('details.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
             },
-            error: function(xhr, status, error) {
-                console.error('AJAX error: ' + error); // Log the AJAX error for debugging
-                console.error('Response text: ' + xhr.responseText); // Log the response text for debugging
-                alert('An error occurred: ' + error);
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data); // Log the response for debugging
+            if (data.success) {
+                const reviewList = document.getElementById('review-list');
+                const reviewItem = document.createElement('div');
+                reviewItem.classList.add('review-item');
+                reviewItem.innerHTML = `<strong>Comment:</strong> ${formData.comment}`;
+                reviewList.appendChild(reviewItem);
+                document.getElementById('review-form').reset();
+            } else {
+                console.error('Failed to submit review: ' + data.error); // Log the error for debugging
+                if (data.logs) {
+                    data.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
+                }
+                alert('Failed to submit review: ' + data.error);
             }
+        })
+        .catch(error => {
+            console.error('Fetch error: ' + error); // Log the fetch error for debugging
+            alert('An error occurred: ' + error);
         });
     });
 });
