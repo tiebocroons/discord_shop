@@ -162,6 +162,12 @@ $reviews = $reviewManager->fetchReviews($productId);
                     console.error('Response text: ' + xhr.responseText); // Log the response text for debugging
                     alert('An error occurred: ' + error);
                 }
+            }).done(function() {
+                console.log("Request completed");
+            }).fail(function(jqXHR, textStatus) {
+                console.error("Request failed: " + textStatus);
+            }).always(function() {
+    console.log("Request ended");
             });
         });
     });
