@@ -42,13 +42,13 @@ class ReviewManager {
     }
 
     private function productExists($productId) {
-        $productId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        $productId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ["options" => ["min_range" => 1]]);
 
             if ($productId === false) {
-             // Handle the error - the ID is not a valid integer
                 echo "Invalid product ID.";
-             exit;
+                exit;
             }
+
 
             $stmt = $this->conn->prepare('SELECT id FROM products WHERE id = ?');
             if (!$stmt) {
