@@ -30,27 +30,14 @@ class ReviewManager {
         }
 
         $stmt = $this->conn->prepare('INSERT INTO product_reviews (user_id, product_id, comment) VALUES (?, ?, ?)');
-        if (!$stmt) {
-            $this->log("Prepare statement failed: " . $this->conn->errorInfo()[2]);
-            throw new Exception("Prepare statement failed: " . $this->conn->errorInfo()[2]);
-        }
-        if (!$stmt->execute([$userId, $productId, $comment])) {
-            $this->log("Execute statement failed: " . $stmt->errorInfo()[2]);
-            throw new Exception("Execute statement failed: " . $stmt->errorInfo()[2]);
-        }
         $this->log("Review added successfully");
     }
 
     private function productExists($productId) {
         $this->log("Checking if product ID: $productId exists");
         $stmt = $this->conn->prepare('SELECT id FROM products WHERE id = ?');
-        if (!$stmt) {
-            $this->log("Prepare statement failed: " . $this->conn->errorInfo()[2]);
-            throw new Exception("Prepare statement failed: " . $this->conn->errorInfo()[2]);
-        }
         $stmt->execute([$productId]);
         $product = $stmt->fetch();
-        $this->log("Product exists: " . ($product !== false ? "Yes" : "No"));
         return $product !== false;
     }
 

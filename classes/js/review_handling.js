@@ -29,11 +29,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 reviewList.appendChild(reviewItem);
                 document.getElementById('review-form').reset();
             } else {
-                console.error('Failed to submit review: ' + data.error); // Log the error for debugging
                 if (data.logs) {
                     data.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
                 }
-                alert('Failed to submit review: ' + data.error);
             }
         })
         .catch(error => {
