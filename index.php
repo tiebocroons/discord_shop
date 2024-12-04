@@ -1,7 +1,8 @@
 <?php
 session_start();
-require_once __DIR__ . "/classes/User.php"; // Include User class
-require_once __DIR__ . "/classes/Database.php"; // Include DB connection
+require_once __DIR__ . "/classes/Database.php";
+require_once __DIR__ . "/classes/User.php";
+require_once __DIR__ . "/classes/Product.php";
 
 // Create User instance and check if user is logged in
 $user = new User();
@@ -17,20 +18,29 @@ $conn = Database::getInstance()->getConnection();
 $categoryQuery = "SELECT DISTINCT category FROM products";
 $categoryResult = $conn->query($categoryQuery);
 
-// Fetch all products, optionally filtered by category
+// Fetch all products, optionally filtered by category or search term
 $category = isset($_GET['category']) ? $_GET['category'] : '';
-$sql = "SELECT * FROM products";
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+$sql = "SELECT * FROM products WHERE 1=1";
+
 if (!empty($category)) {
-    $sql .= " WHERE category = ?";
+    $sql .= " AND category = ?";
+}
+if (!empty($search)) {
+    $sql .= " AND (title LIKE ? OR description LIKE ?)";
 }
 
 $stmt = $conn->prepare($sql);
+$params = [];
 if (!empty($category)) {
-    $stmt->execute([$category]);
-} else {
-    $stmt->execute();
+    $params[] = $category;
 }
-$products = $stmt->fetchAll();
+if (!empty($search)) {
+    $params[] = '%' . $search . '%';
+    $params[] = '%' . $search . '%';
+}
+$stmt->execute($params);
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -39,7 +49,7 @@ $products = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Product Overview</title>
+    <title>Product List</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -53,6 +63,12 @@ $products = $stmt->fetchAll();
                 <a href="add_product.php">Add New Product</a>
             </div>
         <?php endif; ?>
+
+        <!-- Navigation link to cart -->
+        <div class="nav">
+            <a href="cart.php">View Cart</a>
+            <a href="change_credentials.php">Change Name/Password</a>
+        </div>
 
         <!-- Filter by Category -->
         <form method="GET" action="">
@@ -71,6 +87,13 @@ $products = $stmt->fetchAll();
             <button type="submit">Filter</button>
         </form>
 
+        <!-- Search by Name or Description -->
+        <form method="GET" action="">
+            <label for="search">Search:</label>
+            <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search, ENT_QUOTES, 'UTF-8'); ?>">
+            <button type="submit">Search</button>
+        </form>
+
         <h2>Available Products</h2>
         <div class="product-list">
             <?php if (count($products) > 0): ?>
@@ -81,21 +104,51 @@ $products = $stmt->fetchAll();
                         <p><?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><strong>Price:</strong> <?php echo htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8'); ?> units</p>
                         <a href="details.php?id=<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>">View Details</a>
+                        <input type="number" id="quantity-<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>" min="1" value="1">
+                        <button id="buy-button-<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>" onclick="buyProduct(<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>)">Buy Product</button>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p>No products available for the selected category.</p>
+                <p>No products available.</p>
             <?php endif; ?>
         </div>
-
-        <form action="logout.php" method="POST">
-            <button type="submit">Logout</button>
-        </form>
     </div>
+
+    <script>
+    function buyProduct(productId) {
+        const quantityInput = document.getElementById(`quantity-${productId}`);
+        const quantity = parseInt(quantityInput.value, 10);
+        const buyButton = document.getElementById(`buy-button-${productId}`);
+
+        if (isNaN(quantity) || quantity < 1) {
+            alert('Please enter a valid quantity.');
+            return;
+        }
+
+        buyButton.disabled = true;
+
+        fetch('ajax/add_to_cart.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ product_id: productId, quantity: quantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Product added to cart successfully.');
+            } else {
+                alert('Failed to add product to cart: ' + data.error);
+                buyButton.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error);
+            buyButton.disabled = false;
+        });
+    }
+    </script>
 </body>
 </html>
-
-<?php
-// Close DB connection
-$conn = null;
-?>
