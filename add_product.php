@@ -12,6 +12,9 @@ if (!$user->isLoggedIn() || !$user->isAdmin()) {
     exit;
 }
 
+// Get the database connection
+$conn = Database::getInstance()->getConnection();
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get form data
     $title = $_POST['title'];
@@ -26,25 +29,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check for errors in preparing the statement
     if (!$stmt) {
-        die("SQL Error: " . $conn->error);
+        die("SQL Error: " . $conn->errorInfo()[2]);
     }
 
     // Bind the parameters (note the type string must match the number of variables)
-    $stmt->bind_param('ssdss', $title, $description, $price, $img_url, $category);
+    $stmt->bindParam(1, $title);
+    $stmt->bindParam(2, $description);
+    $stmt->bindParam(3, $price);
+    $stmt->bindParam(4, $img_url);
+    $stmt->bindParam(5, $category);
 
     // Execute the statement
     if ($stmt->execute()) {
         echo "Product added successfully.";
     } else {
-        echo "Error adding product: " . $stmt->error;
+        echo "Error adding product: " . $stmt->errorInfo()[2];
     }
 
     // Close the statement
-    $stmt->close();
+    $stmt->closeCursor();
 }
 
 // Close DB connection
-$conn->close();
+$conn = null;
 ?>
 
 <!DOCTYPE html>

@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         
         const formData = {
-            csrf_token: document.querySelector('input[name="csrf_token"]').value, // CSRF token as a string
             user_id: parseInt(document.querySelector('input[name="user_id"]').value, 10), // Convert user_id to an integer
             product_id: parseInt(document.querySelector('input[name="product_id"]').value, 10), // Convert product_id to an integer
             comment: document.getElementById('comment').value
@@ -16,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: formData
+            body: JSON.stringify(formData)
         })
         .then(response => response.json())
         .then(data => {
@@ -29,9 +28,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 reviewList.appendChild(reviewItem);
                 document.getElementById('review-form').reset();
             } else {
+                console.error('Failed to submit review: ' + data.error); // Log the error for debugging
                 if (data.logs) {
                     data.logs.forEach(log => console.error('Server log: ' + log)); // Log the server logs for debugging
                 }
+                alert('Failed to submit review: ' + data.error);
             }
         })
         .catch(error => {
