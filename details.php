@@ -11,14 +11,14 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // Fetch product details from the database
-$productId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ["options" => ["min_range" => 1]]);
+$conn = Database::getInstance()->getConnection();
+$product = null;
+
+$productId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if ($productId === false) {
     echo json_encode(['success' => false, 'error' => 'Invalid product ID.']);
     exit;
 }
-
-$conn = Database::getInstance()->getConnection();
-$product = null;
 
 $stmt = $conn->prepare('SELECT title, description, price, img_url FROM products WHERE id = ?');
 $stmt->execute([$productId]);
@@ -33,15 +33,16 @@ if (!$product) {
 // Handle review submission via POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
-    if (isset($data['user_id'], $data['product_id'], $data['comment']) && 
-        is_int($data['user_id']) && 
-        is_int($data['product_id']) && 
-        is_string($data['comment']) && 
-        !empty(trim($data['comment']))) {
-        
+
+    // Simplified validation
+    if (!empty($data['user_id']) && !empty($data['product_id']) && !empty(trim($data['comment']))) {
+        $userId = (int)$data['user_id'];
+        $productId = (int)$data['product_id'];
+        $comment = trim($data['comment']);
+
         $reviewManager = new ReviewManager();
         try {
-            $reviewManager->addReview($data['user_id'], $data['product_id'], $data['comment']);
+            $reviewManager->addReview($userId, $productId, $comment);
             echo json_encode(['success' => true, 'logs' => $reviewManager->getLogs()]);
             exit;
         } catch (Exception $e) {
@@ -66,7 +67,7 @@ $reviews = $reviewManager->fetchReviews($productId);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Ensure jQuery is loaded -->
-    <script src="../classes/js/review_handling.js"></script> <!-- Include the external JavaScript file -->
+    <script src="classes/js/review_handling.js"></script> <!-- Include the external JavaScript file -->
 </head>
 <body>
     <!-- Product Details Section -->

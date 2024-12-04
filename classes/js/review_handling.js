@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('review-form').addEventListener('submit', function(event) {
         event.preventDefault();
-        
+
         const formData = {
             user_id: parseInt(document.querySelector('input[name="user_id"]').value, 10), // Convert user_id to an integer
             product_id: parseInt(document.querySelector('input[name="product_id"]').value, 10), // Convert product_id to an integer
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         console.log("Form data being sent:", formData); // Log the data being sent for debugging
 
-        fetch('details.php', {
+        fetch('ajax/add_comment.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
