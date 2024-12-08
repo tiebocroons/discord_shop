@@ -1,8 +1,8 @@
 document.getElementById('review-form').addEventListener('submit', function(event) {
     event.preventDefault();
 
-    const productIdElement = document.getElementById('product_id');
-    const commentElement = document.getElementById('comment');
+    const productIdElement = document.getElementById('product_id').value;
+    const commentElement = document.getElementById('comment').value;
 
     // Debugging output to check if elements are found
     console.log('productIdElement:', productIdElement);
