@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . "/classes/Database.php";
-require_once __DIR__ . "/classes/Comment.php";
+require_once __DIR__ . "/../classes/Database.php";
+require_once __DIR__ . "/../classes/Comment.php";
 
 header('Content-Type: application/json');
 
