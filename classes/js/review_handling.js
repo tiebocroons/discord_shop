@@ -4,6 +4,10 @@ document.getElementById('review-form').addEventListener('submit', function(event
     const productIdElement = document.getElementById('product_id');
     const commentElement = document.getElementById('comment');
 
+    // Debugging output to check if elements are found
+    console.log('productIdElement:', productIdElement);
+    console.log('commentElement:', commentElement);
+
     if (!productIdElement || !commentElement) {
         alert('An error occurred: Required form elements are missing.');
         return;
@@ -13,6 +17,9 @@ document.getElementById('review-form').addEventListener('submit', function(event
         product_id: productIdElement.value,
         comment: commentElement.value
     };
+
+    // Debugging output to check form data
+    console.log('formData:', formData);
 
     fetch('ajax/add_comment.php', {
         method: 'POST',
