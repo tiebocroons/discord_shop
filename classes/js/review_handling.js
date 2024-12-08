@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
             comment: document.getElementById('comment').value
         };
 
-        fetch('ajax/add_comment.php', {
+        fetch('../ajax/add_comment.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
