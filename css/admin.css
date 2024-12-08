@@ -1,0 +1,41 @@
+/* Admin Page Styles */
+.product-list {
+  margin-top: 40px;
+}
+
+.product-item {
+  background-color: #2C2F33;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-item img {
+  max-width: 100px;
+  border-radius: 5px;
+  margin-right: 20px;
+}
+
+.product-item h3 {
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.product-item p {
+  margin-bottom: 10px;
+}
+
+.product-item strong {
+  color: #fff;
+}
+
+.product-item button {
+  width: auto;
+  margin: 0 5px;
+}
+button.back-button{
+  background-color: #FF6B6B;
+}
