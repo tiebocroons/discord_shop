@@ -14,8 +14,8 @@ if (!isset($_SESSION['user_id'])) {
 $data = json_decode(file_get_contents('php://input'), true);
 
 // Validate the input
-if (!empty($data['user_id']) && !empty($data['product_id']) && !empty(trim($data['comment']))) {
-    $userId = (int)$data['user_id'];
+if (!empty($data['product_id']) && !empty(trim($data['comment']))) {
+    $userId = $_SESSION['user_id'];
     $productId = (int)$data['product_id'];
     $commentText = trim($data['comment']);
 
