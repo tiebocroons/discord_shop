@@ -1,15 +1,9 @@
 <?php
 session_start();
-require_once 'classes/Database.php';
-require_once 'classes/User.php';
-require_once 'classes/Product.php';
-require_once 'classes/Cart.php';
-
-// Check if the user is authenticated
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
-}
+require_once __DIR__ . "/classes/Database.php";
+require_once __DIR__ . "/classes/User.php";
+require_once __DIR__ . "/classes/Product.php";
+require_once __DIR__ . "/classes/Cart.php";
 
 $user = new User();
 $productManager = new Product();
@@ -48,6 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Fetch cart items for the user
 $cartItems = $cart->getCartItems($userId);
 $totalPrice = $cart->getTotalPrice($userId);
+$cartIsEmpty = empty($cartItems);
 ?>
 
 <!DOCTYPE html>
@@ -55,63 +50,47 @@ $totalPrice = $cart->getTotalPrice($userId);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Cart</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/cart.css">
 </head>
 <body>
     <div class="container">
-        <h1>Your Cart</h1>
+        <h1>Your Shopping Cart</h1>
+        <a href="index.php" class="back-button">Go Back to Homepage</a>
         <?php if (isset($message)): ?>
-            <p class="success"><?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></p>
+            <p class="message"><?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></p>
         <?php endif; ?>
         <?php if (isset($error)): ?>
             <p class="error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></p>
         <?php endif; ?>
-        <table>
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (count($cartItems) > 0): ?>
-                    <?php foreach ($cartItems as $item): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($item['title'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($item['price'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td>
-                                <form method="POST" action="cart.php">
-                                    <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($item['product_id'], ENT_QUOTES, 'UTF-8'); ?>">
-                                    <input type="hidden" name="action" value="update">
-                                    <input type="number" name="quantity" value="<?php echo htmlspecialchars($item['quantity'], ENT_QUOTES, 'UTF-8'); ?>" min="1">
-                                    <button type="submit">Update</button>
-                                </form>
-                            </td>
-                            <td><?php echo htmlspecialchars($item['total'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td>
-                                <form method="POST" action="cart.php">
-                                    <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($item['product_id'], ENT_QUOTES, 'UTF-8'); ?>">
-                                    <input type="hidden" name="action" value="remove">
-                                    <button type="submit">Remove</button>
-                                </form>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="5">Your cart is empty.</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
-        <h2>Total Price: <?php echo htmlspecialchars($totalPrice, ENT_QUOTES, 'UTF-8'); ?> units</h2>
-        <a href="index.php"><button>Back to Products</button></a>
-        <a href="checkout.php"><button>Checkout</button></a>
+        
+        <div class="cart-list">
+            <?php foreach ($cartItems as $item): ?>
+                <div class="cart-item">
+                    <img src="<?php echo htmlspecialchars($item['img_url'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($item['title'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <div>
+                        <h3><?php echo htmlspecialchars($item['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                        <p><?php echo htmlspecialchars($item['description'], ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p><strong>Price:</strong> <?php echo htmlspecialchars($item['price'], ENT_QUOTES, 'UTF-8'); ?> units</p>
+                        <form method="POST" action="">
+                            <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($item['product_id'], ENT_QUOTES, 'UTF-8'); ?>">
+                            <input type="number" name="quantity" value="<?php echo htmlspecialchars($item['quantity'], ENT_QUOTES, 'UTF-8'); ?>" min="1">
+                            <button type="submit" name="action" value="update">Update Quantity</button>
+                            <button type="submit" name="action" value="remove">Remove</button>
+                        </form>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="total-price">
+            <p><strong>Total Price:</strong> <?php echo htmlspecialchars($totalPrice, ENT_QUOTES, 'UTF-8'); ?> units</p>
+        </div>
+
+        <form action="checkout.php" method="GET">
+            <button type="submit" class="checkout-button" <?php echo $cartIsEmpty ? 'disabled' : ''; ?>>Go to Checkout</button>
+        </form>
     </div>
 </body>
 </html>
