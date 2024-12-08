@@ -1,11 +1,10 @@
-
 .container {
   width: 100%;
   max-width: 800px;
   padding: 20px;
 }
 
-h1, h2, h3 {
+h1, h2 {
   color: #fff;
   margin-bottom: 20px;
 }
@@ -44,11 +43,13 @@ button, .nav a, .product-item a {
 button:hover, .nav a:hover, .product-item a:hover {
   background-color: #4752C4;
 }
-.product-details{
-  margin-bottom: 12px;
-}
+
 .product-details img {
+  width: 100%;
   max-width: 100%;
+  height: auto;
+  max-height: 60vh; /* Ensure the image does not exceed 80% of the viewport height */
+  object-fit: scale-down; /* Crop the image to fit the container */
   border-radius: 5px;
   margin-bottom: 20px;
 }
