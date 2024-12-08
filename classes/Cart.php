@@ -19,7 +19,7 @@ class Cart {
     }
 
     public function getCartItems($userId) {
-        $stmt = $this->conn->prepare('SELECT p.id AS product_id, p.title, p.price, c.quantity, (p.price * c.quantity) AS total FROM cart c JOIN products p ON c.product_id = p.id WHERE c.user_id = ?');
+        $stmt = $this->conn->prepare('SELECT p.id AS product_id, p.title, p.description, p.img_url, p.price, c.quantity, (p.price * c.quantity) AS total FROM cart c JOIN products p ON c.product_id = p.id WHERE c.user_id = ?');
         if (!$stmt) {
             throw new Exception("Prepare statement failed: " . $this->conn->errorInfo()[2]);
         }
