@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     } else {
         // Handle failed account creation
-        $error = "Failed to create account. Please try again.";
+        $error = "Failed to create account. Username may already exist. Please try again.";
     }
 }
 ?>
@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="password" id="password" name="password" required>
             <button type="submit">Create Account</button>
         </form>
-        <a href="login.php"><button class="b-LP">Back to Login</button></a>
+        <p class="login-link">Already have an account? <a href="login.php">Login here</a></p>
     </div>
 </body>
 </html>
