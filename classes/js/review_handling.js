@@ -1,12 +1,15 @@
 document.getElementById('review-form').addEventListener('submit', function(event) {
     event.preventDefault();
-
+    const formData = {
+        product_id: productIdElement.value,
+        comment: commentElement.value
+    };
     fetch('ajax/add_comment.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: formData
+        body: JSON.stringify(formData)
     })
     .then(response => response.text()) // Read the response as text
     .then(text => {
