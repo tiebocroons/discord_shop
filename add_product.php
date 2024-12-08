@@ -1,21 +1,17 @@
 <?php
 session_start();
-require_once 'classes/Database.php'; // Include DB connection
-require_once 'classes/User.php'; // Include User class
-require_once 'classes/Product.php'; // Include Product class
+require_once __DIR__ . "/classes/Database.php";
+require_once __DIR__ . "/classes/User.php";
+require_once __DIR__ . "/classes/Product.php";
 
-// Create a User object to check if the user is an admin
 $user = new User();
+$productManager = new Product();
 
 // Check if the user is logged in and is an admin
 if (!$user->isLoggedIn() || !$user->isAdmin()) {
-    header("Location: login.php"); // Redirect if not logged in or not admin
+    header("Location: login.php");
     exit;
 }
-
-// Get the database connection
-$conn = Database::getInstance()->getConnection();
-$productManager = new Product();
 
 // Handle form submission for adding, updating, or deleting a product
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -87,7 +83,7 @@ $products = $productManager->getProducts();
         <div class="product-list">
             <h2>Existing Products</h2>
             <?php foreach ($products as $product): ?>
-                <div class="product-item">
+                <div class="product-item" id="product-<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>">
                     <img src="<?php echo htmlspecialchars($product['img_url'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($product['title'], ENT_QUOTES, 'UTF-8'); ?>">
                     <div>
                         <h3><?php echo htmlspecialchars($product['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
@@ -97,10 +93,7 @@ $products = $productManager->getProducts();
                     </div>
                     <div>
                         <button type="button" onclick="editProduct(<?php echo htmlspecialchars(json_encode($product), ENT_QUOTES, 'UTF-8'); ?>)">Edit</button>
-                        <form method="POST" action="" style="display: inline;">
-                            <input type="hidden" name="id" value="<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>">
-                            <button type="submit" name="delete" class="back-button">Delete</button>
-                        </form>
+                        <button type="button" onclick="deleteProduct(<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>)">Delete</button>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -115,6 +108,30 @@ $products = $productManager->getProducts();
         document.getElementById('price').value = product.price;
         document.getElementById('img_url').value = product.img_url;
         document.getElementById('category').value = product.category;
+    }
+
+    function deleteProduct(productId) {
+        if (confirm('Are you sure you want to delete this product?')) {
+            fetch('ajax/delete_product.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: productId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const productElement = document.getElementById('product-' + productId);
+                    productElement.remove();
+                } else {
+                    alert('Failed to delete product: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('An error occurred: ' + error);
+            });
+        }
     }
     </script>
 </body>
