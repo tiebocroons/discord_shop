@@ -1,19 +1,6 @@
 document.getElementById('review-form').addEventListener('submit', function(event) {
     event.preventDefault();
 
-    const productIdElement = document.getElementById('product_id');
-    const commentElement = document.getElementById('comment');
-
-    if (!productIdElement || !commentElement) {
-        alert('An error occurred: Required form elements are missing.');
-        return;
-    }
-
-    const formData = {
-        product_id: productIdElement.value,
-        comment: commentElement.value
-    };
-
     fetch('ajax/add_comment.php', {
         method: 'POST',
         headers: {
