@@ -1,24 +1,22 @@
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('review-form').addEventListener('submit', function(event) {
-        event.preventDefault();
+document.getElementById('review-form').addEventListener('submit', function(event) {
+    event.preventDefault();
 
-        const formData = {
-            user_id: parseInt(document.querySelector('input[name="user_id"]').value, 10), // Convert user_id to an integer
-            product_id: parseInt(document.querySelector('input[name="product_id"]').value, 10), // Convert product_id to an integer
-            comment: document.getElementById('comment').value
-        };
+    const formData = {
+        product_id: document.getElementById('product_id').value,
+        comment: document.getElementById('comment').value
+    };
 
-        console.log("Form data being sent:", formData); // Log the data being sent for debugging
-
-        fetch('ajax/add_comment.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
+    fetch('ajax/add_comment.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.text()) // Read the response as text
+    .then(text => {
+        try {
+            const data = JSON.parse(text); // Try to parse the response as JSON
             console.log(data); // Log the response for debugging
             if (data.success) {
                 const reviewList = document.getElementById('review-list');
@@ -34,10 +32,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 alert('Failed to submit review: ' + data.error);
             }
-        })
-        .catch(error => {
-            console.error('Fetch error: ' + error); // Log the fetch error for debugging
+        } catch (error) {
+            console.error('Response is not valid JSON:', text); // Log the response text for debugging
             alert('An error occurred: ' + error);
-        });
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error: ' + error); // Log the fetch error for debugging
+        alert('An error occurred: ' + error);
     });
 });
