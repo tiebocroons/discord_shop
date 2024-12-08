@@ -1,20 +1,12 @@
 .container {
   width: 100%;
-  max-width: 400px;
+  max-width: 800px;
   padding: 20px;
 }
 
-.login-box {
-  background-color: #2C2F33;
-  border-radius: 10px;
-  padding: 40px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-h1 {
+h1, h2 {
   color: #fff;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 label {
@@ -25,7 +17,7 @@ label {
 }
 
 input[type="text"],
-input[type="password"] {
+textarea {
   width: 100%;
   padding: 10px;
   margin-bottom: 20px;
@@ -35,20 +27,38 @@ input[type="password"] {
   color: #fff;
 }
 
-button {
-  width: 100%;
-  padding: 12px;
+button, .nav a, .product-item a {
+  padding: 12px 20px;
   background-color: #5865F2;
   border: none;
   border-radius: 5px;
   color: white;
   font-size: 16px;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
   transition: background-color 0.3s ease;
 }
 
-button:hover {
+button:hover, .nav a:hover, .product-item a:hover {
   background-color: #4752C4;
+}
+
+.product-details img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 60vh; /* Ensure the image does not exceed 80% of the viewport height */
+  object-fit: cover; /* Crop the image to fit the container */
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.review-item {
+  background-color: #2C2F33;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
 .error {
@@ -56,16 +66,15 @@ button:hover {
   margin-bottom: 20px;
 }
 
-.signup-link {
-  margin-top: 20px;
-  color: #B9BBBE;
-}
-
-.signup-link a {
+.back-arrow {
+  display: inline-block;
+  margin-bottom: 20px;
   color: #7289DA;
   text-decoration: none;
+  font-size: 24px;
+  transition: color 0.3s ease;
 }
 
-.signup-link a:hover {
-  text-decoration: underline;
+.back-arrow:hover {
+  color: #4752C4;
 }
