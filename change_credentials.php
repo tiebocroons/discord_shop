@@ -36,25 +36,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Change Credentials</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/credentials.css">
 </head>
 <body>
     <div class="container">
-        <h1>Change Name/Password</h1>
+        <h1>Change Credentials</h1>
         <?php if (isset($message)): ?>
-            <p class="success"><?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></p>
+            <p class="message"><?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></p>
         <?php endif; ?>
         <?php if (isset($error)): ?>
             <p class="error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></p>
         <?php endif; ?>
-        <form method="POST" action="change_credentials.php">
+        <form method="POST" action="">
             <label for="new_username">New Username:</label>
             <input type="text" id="new_username" name="new_username">
             <label for="new_password">New Password:</label>
             <input type="password" id="new_password" name="new_password">
             <button type="submit">Update Credentials</button>
+            <button type="button" class="back-button" onclick="window.location.href='index.php'">Go to Homepage</button>
         </form>
-        <a href="index.php"><button>Back to Products</button></a>
     </div>
 </body>
 </html>
