@@ -6,7 +6,7 @@ session_start();
 
 // Check if the user is authenticated
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'error' => 'User not authenticated.']);
+    header("Location: login.php");
     exit;
 }
 
@@ -16,7 +16,7 @@ $product = null;
 
 $productId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if ($productId === false) {
-    echo json_encode(['success' => false, 'error' => 'Invalid product ID.']);
+    echo "Invalid product ID.";
     exit;
 }
 
@@ -26,34 +26,8 @@ $product = $stmt->fetch();
 
 if (!$product) {
     error_log("Product not found for ID: $productId");
-    echo json_encode(['success' => false, 'error' => 'Product not found.']);
+    echo "Product not found.";
     exit;
-}
-
-// Handle review submission via POST request
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
-
-    // Simplified validation
-    if (!empty($data['user_id']) && !empty($data['product_id']) && !empty(trim($data['comment']))) {
-        $userId = (int)$data['user_id'];
-        $productId = (int)$data['product_id'];
-        $comment = trim($data['comment']);
-
-        $reviewManager = new ReviewManager();
-        try {
-            $reviewManager->addReview($userId, $productId, $comment);
-            echo json_encode(['success' => true, 'logs' => $reviewManager->getLogs()]);
-            exit;
-        } catch (Exception $e) {
-            error_log($e->getMessage());
-            echo json_encode(['success' => false, 'error' => $e->getMessage(), 'logs' => $reviewManager->getLogs()]);
-            exit;
-        }
-    } else {
-        echo json_encode(['success' => false, 'error' => 'Invalid input.']);
-        exit;
-    }
 }
 
 // Fetch reviews
@@ -66,20 +40,19 @@ $reviews = $reviewManager->fetchReviews($productId);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Ensure jQuery is loaded -->
-    <script src="classes/js/review_handling.js"></script> <!-- Include the external JavaScript file -->
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Product Details Section -->
-    <div id="product-details">
-        <h1><?php echo htmlspecialchars($product['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
-        <img src="<?php echo htmlspecialchars($product['img_url'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($product['title'], ENT_QUOTES, 'UTF-8'); ?>" />
-        <p><?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></p>
-        <p><strong>Price:</strong> <?php echo htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8'); ?></p>
-    </div>
+    <div class="container">
+        <a href="index.php" class="back-arrow">&larr; Back to Products</a>
+        <div class="product-details">
+            <h1><?php echo htmlspecialchars($product['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
+            <img src="<?php echo htmlspecialchars($product['img_url'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($product['title'], ENT_QUOTES, 'UTF-8'); ?>" />
+            <p><?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></p>
+            <p><strong>Price:</strong> <?php echo htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8'); ?> units</p>
+        </div>
 
-    <!-- Add the review section here -->
-    <div id="reviews">
         <h2>Reviews</h2>
         <div id="review-list">
             <?php foreach ($reviews as $review): ?>
@@ -88,6 +61,7 @@ $reviews = $reviewManager->fetchReviews($productId);
                 </div>
             <?php endforeach; ?>
         </div>
+
         <h3>Add a Review</h3>
         <form id="review-form">
             <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($_SESSION['user_id'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -97,5 +71,7 @@ $reviews = $reviewManager->fetchReviews($productId);
             <button type="submit">Submit Review</button>
         </form>
     </div>
+
+    <script src="classes/js/review_handling.js"></script>
 </body>
 </html>
