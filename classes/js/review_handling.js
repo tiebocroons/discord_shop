@@ -1,5 +1,9 @@
 document.getElementById('review-form').addEventListener('submit', function(event) {
     event.preventDefault();
+    
+    const productIdElement = document.getElementById('product_id');
+    const commentElement = document.getElementById('comment');
+
     const formData = {
         product_id: productIdElement.value,
         comment: commentElement.value
