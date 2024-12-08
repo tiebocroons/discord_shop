@@ -6,7 +6,7 @@ document.getElementById('review-form').addEventListener('submit', function(event
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: formData
     })
     .then(response => response.text()) // Read the response as text
     .then(text => {
