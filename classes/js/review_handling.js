@@ -1,12 +1,12 @@
 document.getElementById('review-form').addEventListener('submit', function(event) {
     event.preventDefault();
     
-    const productIdElement = document.getElementById('product_id');
-    const commentElement = document.getElementById('comment');
+    const productIdElement = document.getElementById('product_id').value;
+    const commentElement = document.getElementById('comment').value;
 
     const formData = {
-        product_id: productIdElement.value,
-        comment: commentElement.value
+        product_id: productIdElement,
+        comment: commentElement
     };
     fetch('ajax/add_comment.php', {
         method: 'POST',
