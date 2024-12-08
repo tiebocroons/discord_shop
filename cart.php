@@ -68,7 +68,7 @@ $cartIsEmpty = empty($cartItems);
         <div class="cart-list">
             <?php foreach ($cartItems as $item): ?>
                 <div class="cart-item">
-                    <img src="<?php echo htmlspecialchars($item['img_url'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($item['title'], ENT_QUOTES, 'UTF-8'); ?>">
+                <img src="<?php echo htmlspecialchars($item['img_url'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($item['title'], ENT_QUOTES, 'UTF-8'); ?>" />
                     <div>
                         <h3><?php echo htmlspecialchars($item['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
                         <p><?php echo htmlspecialchars($item['description'], ENT_QUOTES, 'UTF-8'); ?></p>
