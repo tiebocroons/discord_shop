@@ -76,5 +76,20 @@ class User {
             throw new Exception("Execute statement failed: " . $stmt->errorInfo()[2]);
         }
     }
+    public function createUser($username, $password) {
+        // Check if the username already exists
+        $stmt = $this->conn->prepare('SELECT COUNT(*) FROM users WHERE username = ?');
+        $stmt->execute([$username]);
+        if ($stmt->fetchColumn() > 0) {
+            return false; // User already exists
+        }
+
+        // Hash the password
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        // Insert the new user into the database
+        $stmt = $this->conn->prepare('INSERT INTO users (username, password) VALUES (?, ?)');
+        return $stmt->execute([$username, $hashedPassword]);
+    }
 }
 ?>
