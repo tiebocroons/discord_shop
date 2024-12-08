@@ -1,8 +1,7 @@
 <?php
-
+session_start();
 require_once __DIR__ . "/classes/Database.php";
 require_once __DIR__ . "/classes/ReviewManager.php";
-session_start();
 
 // Check if the user is authenticated
 if (!isset($_SESSION['user_id'])) {
@@ -25,7 +24,6 @@ $stmt->execute([$productId]);
 $product = $stmt->fetch();
 
 if (!$product) {
-    error_log("Product not found for ID: $productId");
     echo "Product not found.";
     exit;
 }
@@ -63,14 +61,12 @@ $reviews = $reviewManager->fetchReviews($productId);
         </div>
         <h3>Add a Review</h3>
         <form id="review-form">
-            <input type="hidden" class="user_id" name="user_id" value="<?php echo htmlspecialchars($_SESSION['user_id'], ENT_QUOTES, 'UTF-8'); ?>">
-            <input type="hidden" class="product_id" name="product_id" value="<?php echo htmlspecialchars($productId, ENT_QUOTES, 'UTF-8'); ?>">
+            <input type="hidden" id="product_id" name="product_id" value="<?php echo htmlspecialchars($productId, ENT_QUOTES, 'UTF-8'); ?>">
             <label for="comment">Comment:</label>
             <textarea id="comment" name="comment" required></textarea>
             <button type="submit">Submit Review</button>
         </form>
+        <script src="js/review_handling.js"></script>
     </div>
-
-    <script src="classes/js/review_handling.js"></script>
 </body>
 </html>
