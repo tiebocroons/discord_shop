@@ -61,7 +61,6 @@ $reviews = $reviewManager->fetchReviews($productId);
                 </div>
             <?php endforeach; ?>
         </div>
-
         <h3>Add a Review</h3>
         <form id="review-form">
             <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($_SESSION['user_id'], ENT_QUOTES, 'UTF-8'); ?>">
