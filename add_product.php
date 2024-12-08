@@ -93,7 +93,7 @@ $products = $productManager->getProducts();
                     </div>
                     <div>
                         <button type="button" onclick="editProduct(<?php echo htmlspecialchars(json_encode($product), ENT_QUOTES, 'UTF-8'); ?>)">Edit</button>
-                        <button type="button" onclick="deleteProduct(<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>)">Delete</button>
+                        <button class="back-button" type="button" onclick="deleteProduct(<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>)">Delete</button>
                     </div>
                 </div>
             <?php endforeach; ?>
