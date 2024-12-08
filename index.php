@@ -11,6 +11,17 @@ if (!$user->isLoggedIn()) {
     exit;
 }
 
+// Handle logout
+if (isset($_POST['logout'])) {
+    session_destroy();
+    header("Location: login.php");
+    exit;
+}
+
+// Get the user's currency
+$userId = $_SESSION['user_id'];
+$userCurrency = $user->getDigitalCurrency($userId);
+
 // Get the database connection
 $conn = Database::getInstance()->getConnection();
 
@@ -50,24 +61,24 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Product List</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
     <div class="container">
-        <h1>Welcome, <?php echo htmlspecialchars($user->getUsername(), ENT_QUOTES, 'UTF-8'); ?>!</h1>
-        <p>You are successfully logged in.</p>
+        <h1>Welcome, <?php echo htmlspecialchars($user->getUsername(), ENT_QUOTES, 'UTF-8'); ?>! Your Currency: <?php echo htmlspecialchars($userCurrency, ENT_QUOTES, 'UTF-8'); ?> units</h1>
+        <p class="logged">You are successfully logged in.</p>
         
-        <!-- Admin check for navigation -->
-        <?php if ($user->isAdmin()): ?>
-            <div class="admin-nav">
-                <a href="add_product.php">Add New Product</a>
-            </div>
-        <?php endif; ?>
-
-        <!-- Navigation link to cart -->
+        <!-- Navigation links -->
         <div class="nav">
             <a href="cart.php">View Cart</a>
             <a href="change_credentials.php">Change Name/Password</a>
+            <?php if ($user->isAdmin()): ?>
+                <a href="add_product.php">Add New Product</a>
+            <?php endif; ?>
+            <form method="POST" action="" style="display: inline;">
+                <button type="submit" name="logout" class="logout-button">Logout</button>
+            </form>
         </div>
 
         <!-- Filter by Category -->
@@ -103,9 +114,14 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <h3><?php echo htmlspecialchars($product['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
                         <p><?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><strong>Price:</strong> <?php echo htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8'); ?> units</p>
-                        <a href="details.php?id=<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>">View Details</a>
-                        <input type="number" id="quantity-<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>" min="1" value="1">
-                        <button id="buy-button-<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>" onclick="buyProduct(<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>)">Buy Product</button>
+                        <form method="GET" action="details.php">
+                            <input type="hidden" name="id" value="<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>">
+                            <button type="submit" class="details-button">View Details</button>
+                        </form>
+                        <div class="buy-container">
+                            <input type="number" id="quantity-<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>" min="1" value="1">
+                            <button id="buy-button-<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>" onclick="buyProduct(<?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?>)">Buy Product</button>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
