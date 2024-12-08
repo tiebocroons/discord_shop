@@ -1,19 +1,19 @@
 <?php
-require_once __DIR__ . "/classes/User.php"; // Include the User class
 session_start();
-
-$user = new User();
+require_once __DIR__ . "/classes/Database.php";
+require_once __DIR__ . "/classes/User.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
+    $user = new User();
     if ($user->createUser($username, $password)) {
-        $_SESSION['success'] = "Account created successfully. You can now log in.";
         header("Location: login.php");
         exit;
     } else {
-        $error = "The username is already in use.";
+        // Handle failed account creation
+        $error = "Failed to create account. Please try again.";
     }
 }
 ?>
@@ -25,7 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Create Account</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/create_account.css">
 </head>
 <body>
     <div class="signup-container">
@@ -40,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="password" id="password" name="password" required>
             <button type="submit">Create Account</button>
         </form>
-        <a href="login.php"><button>Back to Login</button></a>
+        <a href="login.php"><button class="b-LP">Back to Login</button></a>
     </div>
 </body>
 </html>
