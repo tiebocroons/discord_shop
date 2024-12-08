@@ -1,19 +1,4 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
-
-body {
-  background-color: #36393F;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.login-container {
+.container {
   width: 100%;
   max-width: 400px;
   padding: 20px;
@@ -64,6 +49,11 @@ button {
 
 button:hover {
   background-color: #4752C4;
+}
+
+.error {
+  color: #FF6B6B;
+  margin-bottom: 20px;
 }
 
 .signup-link {
